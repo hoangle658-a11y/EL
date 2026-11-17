@@ -1,0 +1,2158 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinguaQuest — Vừa Chơi Vừa Học Giao Tiếp Tiếng Anh</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            obsidian: '#080c14',
+            card: '#111827',
+            cardHover: '#1a2336',
+          },
+          animation: {
+            'float': 'float 3s ease-in-out infinite',
+            'pulse-fast': 'pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'pop-in': 'popIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'slide-up': 'slideUp 0.3s ease-out forwards',
+          },
+          keyframes: {
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' },
+            },
+            popIn: {
+              '0%': { opacity: '0', transform: 'scale(0.92) translateY(8px)' },
+              '100%': { opacity: '1', transform: 'scale(1) translateY(0)' },
+            },
+            slideUp: {
+              '0%': { opacity: '0', transform: 'translateY(14px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar & Gaming Glow Utilities */
+    body {
+      background-color: #080c14;
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(16, 185, 129, 0.09) 0%, transparent 40%);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    .glass-panel {
+      background: rgba(17, 24, 39, 0.82);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .rpg-btn {
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .rpg-btn:active {
+      transform: scale(0.97);
+    }
+
+    .mic-recording {
+      animation: micPulse 1.2s infinite;
+    }
+    @keyframes micPulse {
+      0% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7); }
+      70% { box-shadow: 0 0 0 14px rgba(244, 63, 94, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0); }
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-indigo-500 selection:text-white flex flex-col">
+
+  <!-- ==================== TOP RPG HUD HEADER ==================== -->
+  <header class="sticky top-0 z-40 glass-panel border-b border-slate-800/80 px-3 sm:px-6 py-2.5">
+    <div class="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-2 sm:gap-4">
+      
+      <!-- Brand / Home Return -->
+      <button onclick="navigateTo('hub')" class="flex items-center gap-2.5 text-left group focus:outline-none">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-emerald-400 p-0.5 shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+          <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center text-xl">
+            ⚔️
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-indigo-200 to-emerald-200 bg-clip-text text-transparent">
+              LinguaQuest
+            </span>
+            <span class="hidden sm:inline-block text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              RPG
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 hidden sm:block">Chơi để nói tiếng Anh tự nhiên</p>
+        </div>
+      </button>
+
+      <!-- Player RPG Stats (Level, XP Bar, Streak, Combo, Gems) -->
+      <div class="flex items-center gap-2 sm:gap-3 order-3 lg:order-2 w-full lg:w-auto justify-between lg:justify-center bg-slate-900/70 px-3 py-1.5 rounded-xl border border-slate-800/80">
+        <!-- Level & XP -->
+        <div class="flex items-center gap-2 flex-1 sm:flex-initial min-w-[135px]">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600/30 border border-indigo-500/50 flex flex-col items-center justify-center leading-none">
+            <span class="text-[9px] text-indigo-300 font-bold uppercase">LV</span>
+            <span id="hud-level" class="text-sm font-extrabold text-white">1</span>
+          </div>
+          <div class="flex-1">
+            <div class="flex justify-between text-[11px] font-semibold mb-0.5">
+              <span class="text-indigo-300">XP</span>
+              <span id="hud-xp-text" class="text-slate-300 font-mono">0 / 150</span>
+            </div>
+            <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div id="hud-xp-bar" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="h-5 w-px bg-slate-800"></div>
+
+        <!-- Streak -->
+        <div class="flex items-center gap-1 px-1.5" title="Chuỗi ngày / Câu đúng liên tiếp">
+          <span class="text-base">🔥</span>
+          <span id="hud-streak" class="text-xs sm:text-sm font-bold text-orange-400 font-mono">1</span>
+        </div>
+
+        <!-- Combo Multiplier -->
+        <div id="hud-combo-badge" class="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-purple-500/15 border border-purple-500/30" title="Hệ số nhân điểm Combo">
+          <span class="text-xs font-bold text-purple-300 font-mono" id="hud-combo">1.0x</span>
+        </div>
+
+        <!-- Gems -->
+        <div class="flex items-center gap-1 px-1.5" title="Đá quý tích lũy">
+          <span class="text-base">💎</span>
+          <span id="hud-gems" class="text-xs sm:text-sm font-bold text-cyan-300 font-mono">20</span>
+        </div>
+      </div>
+
+      <!-- Global Controls (Speed, Translation Toggle, Sound, Phrasebook) -->
+      <div class="flex items-center gap-1.5 sm:gap-2 order-2 lg:order-3">
+        <!-- TTS Speed Toggle -->
+        <button id="btn-speed" onclick="toggleSpeechRate()" class="rpg-btn px-2.5 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 text-xs font-mono font-bold text-slate-200 flex items-center gap-1" title="Tốc độ giọng đọc tiếng Anh">
+          <span>🔊</span>
+          <span id="speed-label">1.0x</span>
+        </button>
+
+        <!-- Vietnamese Translation Toggle -->
+        <button id="btn-trans" onclick="toggleTranslation()" class="rpg-btn px-2.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-xs font-semibold text-emerald-300 flex items-center gap-1" title="Ẩn/Hiện dịch tiếng Việt để tự luyện nghe hiểu">
+          <span>🇻🇳</span>
+          <span id="trans-label" class="hidden sm:inline">Dịch: Bật</span>
+        </button>
+
+        <!-- Sound FX Toggle -->
+        <button id="btn-sound" onclick="toggleSound()" class="rpg-btn p-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700/80 text-sm text-slate-200" title="Bật/Tắt hiệu ứng âm thanh">
+          <span id="sound-icon">🔔</span>
+        </button>
+
+        <!-- Phrasebook Drawer Trigger -->
+        <button onclick="openPhrasebook()" class="rpg-btn relative px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 hover:from-amber-500/30 hover:to-orange-500/30 border border-amber-500/40 text-amber-300 text-xs font-bold flex items-center gap-1.5">
+          <span>📒</span>
+          <span class="hidden md:inline">Sổ tay</span>
+          <span id="phrasebook-count" class="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 font-mono text-[11px] font-extrabold">2</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 py-5 sm:py-7">
+
+    <!-- ==================== VIEW 1: GAME HUB (HOME) ==================== -->
+    <section id="view-hub" class="space-y-7 animate-pop-in">
+      
+      <!-- Hero Welcome Banner -->
+      <div class="relative overflow-hidden rounded-3xl glass-panel p-5 sm:p-8 border border-indigo-500/25 shadow-2xl">
+        <div class="absolute -right-12 -top-12 w-56 h-56 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-12 -bottom-12 w-56 h-56 bg-emerald-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div class="space-y-2.5 max-w-2xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-semibold">
+              <span>✨ Học qua trải nghiệm thực tế</span>
+              <span>•</span>
+              <span>Tránh bẫy dịch từng chữ (Viet-English)</span>
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-white leading-tight">
+              Sẵn sàng chinh phục <span class="bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400 bg-clip-text text-transparent">giao tiếp tiếng Anh</span> hôm nay?
+            </h1>
+            <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+              Nhập vai vào các tình huống đời thực, tự do trò chuyện bằng giọng nói với AI hoặc thử thách tốc độ phản xạ trong 60 giây.
+            </p>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="flex flex-col sm:flex-row md:flex-col gap-2.5 w-full md:w-auto shrink-0">
+            <button onclick="startQuest('coffee')" class="rpg-btn px-5 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-bold text-sm shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2">
+              <span>▶️</span>
+              <span>Chơi Nhiệm Vụ Đầu Tiên</span>
+            </button>
+            <button onclick="startReflexGame()" class="rpg-btn px-5 py-3 rounded-2xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-emerald-300 font-bold text-sm flex items-center justify-center gap-2">
+              <span>⚡</span>
+              <span>Đấu Phản Xạ 60s</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 1: Story Roleplay Quests -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
+              <span>🎭</span>
+              <span>Chế Độ 1: Nhập Vai Cốt Truyện (Story Quests)</span>
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-400">Chọn thẻ câu trả lời chuẩn bản xứ hoặc bật Mic tự nói chuyện trực tiếp với nhân vật</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Quest 1 -->
+          <div onclick="startQuest('coffee')" class="rpg-btn cursor-pointer group rounded-2xl glass-panel hover:bg-slate-800/70 p-5 border border-slate-800 hover:border-amber-500/50 transition-all flex flex-col justify-between gap-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3.5">
+                <div class="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                  ☕
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-[11px] font-bold uppercase px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300">Beginner • A1-A2</span>
+                    <span class="text-xs text-amber-400 font-mono font-bold">+120 XP</span>
+                  </div>
+                  <h3 class="font-extrabold text-base sm:text-lg text-white group-hover:text-amber-300 transition-colors">
+                    The Hidden Coffee Shop
+                  </h3>
+                  <p class="text-xs text-slate-400">Gọi đồ uống, tùy chỉnh đá/sữa & trò chuyện cùng Barista Leo</p>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-slate-800/80 text-xs">
+              <span class="text-slate-400">🎯 Mục tiêu: Order tự nhiên không ngập ngừng</span>
+              <span class="text-amber-400 font-bold group-hover:translate-x-1 transition-transform">Bắt đầu →</span>
+            </div>
+          </div>
+
+          <!-- Quest 2 -->
+          <div onclick="startQuest('airport')" class="rpg-btn cursor-pointer group rounded-2xl glass-panel hover:bg-slate-800/70 p-5 border border-slate-800 hover:border-sky-500/50 transition-all flex flex-col justify-between gap-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3.5">
+                <div class="w-14 h-14 rounded-2xl bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                  ✈️
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-[11px] font-bold uppercase px-2 py-0.5 rounded-md bg-sky-500/20 text-sky-300">Elementary • A2-B1</span>
+                    <span class="text-xs text-amber-400 font-mono font-bold">+160 XP</span>
+                  </div>
+                  <h3 class="font-extrabold text-base sm:text-lg text-white group-hover:text-sky-300 transition-colors">
+                    Airport Adventure
+                  </h3>
+                  <p class="text-xs text-slate-400">Làm thủ tục check-in, xin đổi ghế cửa sổ & qua cửa hải quan</p>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-slate-800/80 text-xs">
+              <span class="text-slate-400">🎯 Mục tiêu: Xử lý sự cố & yêu cầu lịch sự</span>
+              <span class="text-sky-400 font-bold group-hover:translate-x-1 transition-transform">Bắt đầu →</span>
+            </div>
+          </div>
+
+          <!-- Quest 3 -->
+          <div onclick="startQuest('hotel')" class="rpg-btn cursor-pointer group rounded-2xl glass-panel hover:bg-slate-800/70 p-5 border border-slate-800 hover:border-purple-500/50 transition-all flex flex-col justify-between gap-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3.5">
+                <div class="w-14 h-14 rounded-2xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                  🕵️
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-[11px] font-bold uppercase px-2 py-0.5 rounded-md bg-purple-500/20 text-purple-300">Intermediate • B1-B2</span>
+                    <span class="text-xs text-amber-400 font-mono font-bold">+220 XP</span>
+                  </div>
+                  <h3 class="font-extrabold text-base sm:text-lg text-white group-hover:text-purple-300 transition-colors">
+                    Hotel Mystery
+                  </h3>
+                  <p class="text-xs text-slate-400">Truy tìm chiếc vali VIP bị tráo nhầm cùng quản lý Julian</p>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-slate-800/80 text-xs">
+              <span class="text-slate-400">🎯 Mục tiêu: Đặt câu hỏi gián tiếp & suy luận</span>
+              <span class="text-purple-400 font-bold group-hover:translate-x-1 transition-transform">Bắt đầu →</span>
+            </div>
+          </div>
+
+          <!-- Quest 4: AI Free-Roam -->
+          <div onclick="navigateTo('ai-setup')" class="rpg-btn cursor-pointer group rounded-2xl bg-gradient-to-br from-indigo-950/90 via-slate-900 to-emerald-950/70 hover:brightness-110 p-5 border border-indigo-500/40 shadow-lg shadow-indigo-500/10 transition-all flex flex-col justify-between gap-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-3.5">
+                <div class="w-14 h-14 rounded-2xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
+                  🤖
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-[11px] font-bold uppercase px-2 py-0.5 rounded-md bg-indigo-500 text-white">AI Sandbox • Gemini</span>
+                    <span class="text-xs text-emerald-400 font-mono font-bold">Không giới hạn</span>
+                  </div>
+                  <h3 class="font-extrabold text-base sm:text-lg text-white group-hover:text-indigo-300 transition-colors">
+                    AI Conversation Partner
+                  </h3>
+                  <p class="text-xs text-slate-300">Tự chọn bối cảnh bất kỳ & nói chuyện tự do với AI chấm điểm độ tự nhiên</p>
+                </div>
+              </div>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-indigo-500/20 text-xs">
+              <span class="text-indigo-200">🎙️ Hỗ trợ nhận diện giọng nói & sửa lỗi</span>
+              <span class="text-emerald-400 font-bold group-hover:translate-x-1 transition-transform">Tạo phòng AI →</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode 2: Speed Reflex 60s Arcade -->
+      <div class="space-y-4">
+        <h2 class="text-lg sm:text-xl font-extrabold text-white flex items-center gap-2">
+          <span>⚡</span>
+          <span>Chế Độ 2: Đấu Trường Phản Xạ Nhanh</span>
+        </h2>
+
+        <div onclick="startReflexGame()" class="rpg-btn cursor-pointer rounded-3xl bg-gradient-to-r from-rose-950/70 via-slate-900 to-amber-950/60 border border-rose-500/35 hover:border-rose-400/60 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-4xl shrink-0 animate-float">
+              ⏱️
+            </div>
+            <div class="space-y-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-rose-500 text-white">60 Giây Sinh Tử</span>
+                <span class="text-xs font-mono text-amber-300">Kỷ lục: <strong id="hub-reflex-best">0</strong> điểm</span>
+              </div>
+              <h3 class="text-lg sm:text-xl font-extrabold text-white">Phản Xạ Giao Tiếp Tốc Độ Cao</h3>
+              <p class="text-xs sm:text-sm text-slate-300">
+                Người bản xứ hỏi dồn dập! Tránh ngay các câu "bẫy" kiểu <em class="text-rose-300">"I'm fine thank you and you"</em> để giữ chuỗi Combo x3!
+              </p>
+            </div>
+          </div>
+          <button class="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-gradient-to-r from-rose-600 to-orange-500 hover:from-rose-500 hover:to-orange-400 text-white font-extrabold text-sm shadow-lg shadow-rose-600/30 shrink-0">
+            Chơi Ngay 🔥
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== VIEW 2: AI FREE-ROAM SETUP ==================== -->
+    <section id="view-ai-setup" class="hidden max-w-3xl mx-auto space-y-6 animate-pop-in">
+      <div class="flex items-center justify-between">
+        <button onclick="navigateTo('hub')" class="rpg-btn px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 flex items-center gap-1.5">
+          <span>←</span>
+          <span>Quay lại</span>
+        </button>
+        <span class="text-xs font-mono text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full border border-indigo-500/30">
+          Powered by Gemini 3 Flash
+        </span>
+      </div>
+
+      <div class="glass-panel rounded-3xl p-5 sm:p-7 space-y-6 border border-indigo-500/30">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-white mb-1">🤖 Chọn Bối Cảnh Nhập Vai Với AI</h2>
+          <p class="text-xs sm:text-sm text-slate-400">Chọn nhanh một tình huống bên dưới hoặc tự viết kịch bản của riêng bạn.</p>
+        </div>
+
+        <!-- Preset Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button onclick="launchCustomAI('Phỏng vấn xin việc tại công ty công nghệ quốc tế', 'Sarah (Tech Recruiter)', '👩‍💼', 'Hi! Thanks for joining the call today. To kick things off, could you tell me a little bit about yourself and what excites you about this role?')" class="rpg-btn text-left p-4 rounded-2xl bg-slate-900/90 hover:bg-indigo-950/50 border border-slate-800 hover:border-indigo-500/50 transition-all">
+            <div class="text-2xl mb-1.5">👩‍💼</div>
+            <div class="font-bold text-sm text-white">Phỏng Vấn Tech Startup</div>
+            <div class="text-xs text-slate-400 mt-0.5">Luyện giới thiệu bản thân & điểm mạnh chuyên nghiệp</div>
+          </button>
+
+          <button onclick="launchCustomAI('Trò chuyện làm quen bạn mới tại một quán Pub ở London', 'Liam (Friendly Local)', '🍻', 'Hey mate! Mind if I squeeze in here? This place is packed tonight. Are you visiting London or do you live around here?')" class="rpg-btn text-left p-4 rounded-2xl bg-slate-900/90 hover:bg-indigo-950/50 border border-slate-800 hover:border-indigo-500/50 transition-all">
+            <div class="text-2xl mb-1.5">🍻</div>
+            <div class="font-bold text-sm text-white">Bắt Chuyện Ở Pub London</div>
+            <div class="text-xs text-slate-400 mt-0.5">Small talk tự nhiên, tiếng lóng nhẹ nhàng & thân thiện</div>
+          </button>
+
+          <button onclick="launchCustomAI('Mua sắm và trả giá tại chợ đồ cổ ở New York', 'Marcus (Vintage Shop Owner)', '🧥', 'Welcome in! Looking for anything specific today, or just browsing? That leather jacket you are looking at is a real 1980s classic.')" class="rpg-btn text-left p-4 rounded-2xl bg-slate-900/90 hover:bg-indigo-950/50 border border-slate-800 hover:border-indigo-500/50 transition-all">
+            <div class="text-2xl mb-1.5">🧥</div>
+            <div class="font-bold text-sm text-white">Mua Sắm & Mặc Cả</div>
+            <div class="text-xs text-slate-400 mt-0.5">Hỏi chất liệu, thử đồ và thương lượng giá lịch sự</div>
+          </button>
+
+          <button onclick="launchCustomAI('Khám bệnh tại phòng khám quốc tế khi bị đau họng và sốt nhẹ', 'Dr. Emily (General Physician)', '🩺', 'Good morning! Please have a seat. What seems to be bringing you in today, and how long have you been feeling this way?')" class="rpg-btn text-left p-4 rounded-2xl bg-slate-900/90 hover:bg-indigo-950/50 border border-slate-800 hover:border-indigo-500/50 transition-all">
+            <div class="text-2xl mb-1.5">🩺</div>
+            <div class="font-bold text-sm text-white">Khám Bác Sĩ Quốc Tế</div>
+            <div class="text-xs text-slate-400 mt-0.5">Mô tả triệu chứng sức khỏe rõ ràng, chính xác</div>
+          </button>
+        </div>
+
+        <!-- Custom Input Form -->
+        <div class="pt-4 border-t border-slate-800 space-y-3">
+          <label class="block text-xs font-bold uppercase tracking-wider text-indigo-300">Hoặc tự tạo kịch bản riêng:</label>
+          <input id="custom-ai-topic" type="text" placeholder="Ví dụ: Gặp thần tượng ở sân bay, Xin hoàn tiền khách sạn..." class="w-full px-4 py-3 rounded-xl bg-slate-950 border border-slate-700 focus:border-indigo-500 focus:outline-none text-sm text-white placeholder-slate-500" />
+          <button onclick="handleCreateCustomAI()" class="rpg-btn w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm shadow-lg shadow-indigo-600/25">
+            🚀 Bắt Đầu Cuộc Trò Chuyện AI
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: STORY QUEST / AI ROLEPLAY ARENA ==================== -->
+    <section id="view-quest" class="hidden max-w-4xl mx-auto space-y-4 animate-pop-in">
+      
+      <!-- Top Quest Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-2 glass-panel px-4 py-3 rounded-2xl">
+        <button onclick="navigateTo('hub')" class="rpg-btn px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300 flex items-center gap-1">
+          <span>←</span>
+          <span>Thoát</span>
+        </button>
+
+        <div class="flex items-center gap-2">
+          <span id="quest-badge" class="text-xs font-bold px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            Quest 1
+          </span>
+          <h2 id="quest-title" class="font-extrabold text-sm sm:text-base text-white">The Hidden Coffee Shop</h2>
+        </div>
+
+        <!-- Step Progress -->
+        <div class="flex items-center gap-1.5" id="quest-progress-dots">
+          <!-- Injected by JS -->
+        </div>
+      </div>
+
+      <!-- NPC Character Stage -->
+      <div class="glass-panel rounded-3xl p-4 sm:p-5 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
+        <div class="flex items-center gap-4 z-10 w-full sm:w-auto">
+          <!-- Stylized SVG Avatar Container -->
+          <div id="npc-avatar-box" class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border-2 border-indigo-400/40 flex items-center justify-center shrink-0 shadow-lg">
+            <!-- SVG injected dynamically -->
+          </div>
+          <div class="space-y-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <h3 id="npc-name" class="font-extrabold text-base sm:text-lg text-white">Leo</h3>
+              <span id="npc-role" class="text-xs text-slate-400">• Barista</span>
+              <span id="npc-mood" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                😊 Thân thiện
+              </span>
+            </div>
+            <p id="quest-objective" class="text-xs text-amber-300/90 font-medium">
+              🎯 Nhiệm vụ: Gọi một ly cà phê theo ý thích thật tự nhiên.
+            </p>
+          </div>
+        </div>
+
+        <!-- Replay Last NPC Voice Button -->
+        <button onclick="speakLastNpcLine()" class="rpg-btn w-full sm:w-auto px-4 py-2.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-200 text-xs font-bold flex items-center justify-center gap-2 shrink-0">
+          <span>🔊</span>
+          <span>Nghe lại câu thoại</span>
+        </button>
+      </div>
+
+      <!-- Dialogue Chat History -->
+      <div id="chat-feed" class="glass-panel rounded-3xl p-4 sm:p-5 space-y-4 max-h-[380px] sm:max-h-[420px] overflow-y-auto border border-slate-800/90 scroll-smooth">
+        <!-- Messages appended dynamically -->
+      </div>
+
+      <!-- AI Coaching Feedback Card (Shown after player responds) -->
+      <div id="coaching-card" class="hidden rounded-2xl p-4 border transition-all animate-slide-up">
+        <!-- Populated dynamically -->
+      </div>
+
+      <!-- Player Response Dock -->
+      <div id="response-dock" class="glass-panel rounded-3xl p-4 sm:p-5 border border-slate-700/80 space-y-3.5">
+        
+        <!-- Mode Switcher Tabs (Choice Cards vs Free Type / Voice Mic) -->
+        <div id="input-mode-tabs" class="flex items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <button id="tab-choice" onclick="switchInputMode('choice')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow">
+              🎴 Chọn Thẻ Phản Hồi
+            </button>
+            <button id="tab-free" onclick="switchInputMode('free')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 flex items-center gap-1.5">
+              <span>🎙️ Tự Nói / Nhập AI</span>
+            </button>
+          </div>
+          <span class="text-[11px] text-slate-400 hidden sm:inline">Mẹo: Bấm loa trên từng thẻ để nghe thử phát âm</span>
+        </div>
+
+        <!-- Sub-panel A: Pre-built Choice Cards -->
+        <div id="panel-choices" class="space-y-2.5">
+          <!-- Choice buttons injected here -->
+        </div>
+
+        <!-- Sub-panel B: Free Type / Voice Speech Recognition -->
+        <div id="panel-free" class="hidden space-y-3">
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <!-- Microphone Button -->
+            <button id="btn-mic" onclick="toggleSpeechRecognition()" class="rpg-btn px-4 py-3 rounded-2xl bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-300 font-bold text-xs flex items-center justify-center gap-2 shrink-0">
+              <span id="mic-icon" class="text-base">🎙️</span>
+              <span id="mic-label">Bấm Để Nói</span>
+            </button>
+
+            <!-- Text Input -->
+            <input id="free-text-input" type="text" onkeydown="if(event.key==='Enter') submitFreeResponse()" placeholder="Nhập hoặc nói câu trả lời tiếng Anh của bạn..." class="flex-1 px-4 py-3 rounded-2xl bg-slate-950 border border-slate-700 focus:border-indigo-500 focus:outline-none text-sm text-white placeholder-slate-500" />
+
+            <!-- Send Button -->
+            <button id="btn-send-free" onclick="submitFreeResponse()" class="rpg-btn px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white font-bold text-sm shadow-lg shrink-0">
+              Gửi ✨
+            </button>
+          </div>
+          <p id="mic-status" class="text-[11px] text-slate-400">
+            💡 Bạn có thể nói trực tiếp bằng tiếng Anh (Chrome/Edge/Safari) hoặc gõ phím để AI chấm độ tự nhiên.
+          </p>
+        </div>
+
+        <!-- Next Turn / Complete Quest Button (Appears after answering) -->
+        <div id="next-turn-container" class="hidden pt-1">
+          <button id="btn-next-turn" onclick="advanceQuestTurn()" class="rpg-btn w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2">
+            <span>Tiếp tục hội thoại</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== VIEW 4: SPEED REFLEX 60S MINI-GAME ==================== -->
+    <section id="view-reflex" class="hidden max-w-3xl mx-auto space-y-5 animate-pop-in">
+      
+      <!-- Top Arcade HUD -->
+      <div class="glass-panel rounded-2xl p-4 flex items-center justify-between gap-3 border border-rose-500/30">
+        <button onclick="endReflexGame(true)" class="rpg-btn px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-300">
+          ✕ Dừng
+        </button>
+
+        <!-- Global 60s Countdown -->
+        <div class="flex items-center gap-2 bg-slate-950 px-4 py-1.5 rounded-xl border border-slate-800">
+          <span class="text-base">⏱️</span>
+          <span id="reflex-timer" class="font-mono text-xl font-extrabold text-rose-400">60s</span>
+        </div>
+
+        <!-- Score & Multiplier -->
+        <div class="flex items-center gap-3">
+          <span id="reflex-combo" class="px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-xs font-extrabold">
+            1x
+          </span>
+          <div class="text-right">
+            <div class="text-[10px] uppercase text-slate-400 font-bold">Điểm</div>
+            <div id="reflex-score" class="font-mono text-lg font-extrabold text-white">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Per-Question Urgency Bar -->
+      <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+        <div id="reflex-question-bar" class="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 transition-all duration-100" style="width: 100%"></div>
+      </div>
+
+      <!-- Active Arcade Card -->
+      <div id="reflex-play-area" class="glass-panel rounded-3xl p-5 sm:p-7 space-y-6 border border-slate-800 shadow-2xl">
+        <div class="space-y-2 text-center">
+          <span id="reflex-context-tag" class="inline-block text-xs font-bold px-3 py-1 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+            Tình huống giao tiếp hàng ngày
+          </span>
+          <div class="flex items-center justify-center gap-2 pt-2">
+            <h3 id="reflex-prompt-en" class="text-xl sm:text-2xl font-extrabold text-white leading-snug">
+              "What have you been up to lately?"
+            </h3>
+            <button onclick="speakText(currentReflexQuestion.en)" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-indigo-300 shrink-0" title="Nghe phát âm">
+              🔊
+            </button>
+          </div>
+          <p id="reflex-prompt-vi" class="text-xs sm:text-sm text-slate-400">
+            (Dạo này bạn đang làm gì / bận rộn chuyện gì thế?)
+          </p>
+        </div>
+
+        <!-- 4 Fast-Tap Choices -->
+        <div id="reflex-options" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Options injected dynamically -->
+        </div>
+
+        <!-- Instant Mini Explanation Banner -->
+        <div id="reflex-feedback-banner" class="hidden rounded-2xl p-3.5 text-xs sm:text-sm font-medium text-center animate-pop-in">
+        </div>
+      </div>
+
+      <!-- End of Game Summary Modal Card -->
+      <div id="reflex-gameover-area" class="hidden glass-panel rounded-3xl p-6 sm:p-8 text-center space-y-5 border border-amber-500/40 animate-pop-in">
+        <div class="text-5xl">🏆</div>
+        <div>
+          <h3 class="text-2xl font-extrabold text-white">Hết Giờ! Tổng Kết Phản Xạ</h3>
+          <p class="text-sm text-slate-400 mt-1">Tốc độ và độ tự nhiên của bạn thật ấn tượng!</p>
+        </div>
+        <div class="grid grid-cols-3 gap-3 max-w-md mx-auto">
+          <div class="bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
+            <div class="text-xs text-slate-400">Tổng điểm</div>
+            <div id="reflex-final-score" class="text-xl font-extrabold text-amber-400 font-mono">0</div>
+          </div>
+          <div class="bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
+            <div class="text-xs text-slate-400">Câu chuẩn</div>
+            <div id="reflex-final-correct" class="text-xl font-extrabold text-emerald-400 font-mono">0</div>
+          </div>
+          <div class="bg-slate-900/90 p-3 rounded-2xl border border-slate-800">
+            <div class="text-xs text-slate-400">Thưởng XP</div>
+            <div id="reflex-final-xp" class="text-xl font-extrabold text-indigo-400 font-mono">+0</div>
+          </div>
+        </div>
+        <div class="flex flex-wrap justify-center gap-3 pt-2">
+          <button onclick="startReflexGame()" class="rpg-btn px-6 py-3 rounded-2xl bg-gradient-to-r from-rose-600 to-orange-500 text-white font-bold text-sm">
+            🔄 Chơi Lại Ngay
+          </button>
+          <button onclick="navigateTo('hub')" class="rpg-btn px-6 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm">
+            Về Trang Chủ
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==================== SLIDE-OVER DRAWER: PHRASEBOOK (SỔ TAY CỤM TỪ) ==================== -->
+  <div id="phrasebook-overlay" onclick="closePhrasebook()" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden transition-opacity"></div>
+  <aside id="phrasebook-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-slate-950 border-l border-slate-800 z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+    <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl">📒</span>
+        <div>
+          <h3 class="font-extrabold text-base text-white">Sổ Tay Cụm Từ Bản Xứ</h3>
+          <p class="text-xs text-slate-400">Các mẫu câu bạn đã mở khóa khi chơi</p>
+        </div>
+      </div>
+      <button onclick="closePhrasebook()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-bold">
+        ✕
+      </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="p-3 border-b border-slate-800/80">
+      <input id="phrasebook-search" oninput="renderPhrasebook()" type="text" placeholder="Tìm cụm từ tiếng Anh hoặc tiếng Việt..." class="w-full px-3.5 py-2 rounded-xl bg-slate-900 border border-slate-800 focus:border-amber-500/60 focus:outline-none text-xs text-white placeholder-slate-500" />
+    </div>
+
+    <!-- Saved Phrases List -->
+    <div id="phrasebook-list" class="flex-1 overflow-y-auto p-4 space-y-3">
+      <!-- Populated dynamically -->
+    </div>
+  </aside>
+
+  <!-- ==================== TOAST NOTIFICATION CONTAINER ==================== -->
+  <div id="toast-container" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-xs w-full"></div>
+
+  <!-- ==================== JAVASCRIPT APPLICATION LOGIC ==================== -->
+  <script>
+    // =========================================================================
+    // 1. GEMINI API CONFIGURATION & HELPER
+    // =========================================================================
+    const apiKey = ""; // Canvas runtime injects API key automatically when empty
+    const GEMINI_MODEL = "gemini-3-flash-preview";
+
+    /**
+     * Calls Gemini API with exponential backoff (1s, 2s, 4s) for resilience.
+     */
+    async function callGeminiStructured(systemInstruction, userPrompt, responseSchema) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
+      const payload = {
+        contents: [{ parts: [{ text: userPrompt }] }],
+        systemInstruction: { parts: [{ text: systemInstruction }] },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: responseSchema
+        }
+      };
+
+      const delays = [1000, 2000, 4000];
+      for (let attempt = 0; attempt <= delays.length; attempt++) {
+        try {
+          const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          const data = await response.json();
+          const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (!rawText) throw new Error("Empty candidate response");
+          return JSON.parse(rawText);
+        } catch (err) {
+          if (attempt === delays.length) {
+            return null; // Trigger graceful local fallback
+          }
+          await new Promise(res => setTimeout(res, delays[attempt]));
+        }
+      }
+      return null;
+    }
+
+    // =========================================================================
+    // 2. WEB AUDIO API SOUND SYNTHESIZER (NO EXTERNAL SOUND FILES NEEDED)
+    // =========================================================================
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) audioCtx = new AudioContextClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      if (!gameState.soundEnabled) return;
+      try {
+        initAudio();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'click') {
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(300, now + 0.06);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+          osc.start(now);
+          osc.stop(now + 0.06);
+        } else if (type === 'success') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now);       // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+          gain.gain.setValueAtTime(0.14, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'levelup') {
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.setValueAtTime(554.37, now + 0.1);
+          osc.frequency.setValueAtTime(659.25, now + 0.2);
+          osc.frequency.setValueAtTime(880, now + 0.3);
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+          osc.start(now);
+          osc.stop(now + 0.55);
+        } else if (type === 'error') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(190, now);
+          osc.frequency.linearRampToValueAtTime(135, now + 0.22);
+          gain.gain.setValueAtTime(0.1, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.24);
+          osc.start(now);
+          osc.stop(now + 0.24);
+        }
+      } catch (e) {
+        // Silently ignore audio block errors
+      }
+    }
+
+    // =========================================================================
+    // 3. TEXT-TO-SPEECH (TTS) & SPEECH RECOGNITION (STT)
+    // =========================================================================
+    function speakText(text) {
+      if (!('speechSynthesis' in window)) {
+        showToast("Trình duyệt không hỗ trợ đọc giọng nói.", "warn");
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = gameState.speechRate;
+      
+      // Pick a natural-sounding English voice if available
+      const voices = window.speechSynthesis.getVoices();
+      const preferred = voices.find(v => v.lang.includes('en-US') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha')))
+                     || voices.find(v => v.lang.startsWith('en'));
+      if (preferred) utterance.voice = preferred;
+
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Preload voices
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+    }
+
+    let recognition = null;
+    let isRecording = false;
+
+    function toggleSpeechRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        showToast("Trình duyệt của bạn chưa hỗ trợ Mic. Hãy gõ câu trả lời nhé!", "warn");
+        return;
+      }
+
+      if (isRecording && recognition) {
+        recognition.stop();
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = true;
+      recognition.maxAlternatives = 1;
+
+      const btnMic = document.getElementById('btn-mic');
+      const micLabel = document.getElementById('mic-label');
+      const micStatus = document.getElementById('mic-status');
+      const inputEl = document.getElementById('free-text-input');
+
+      recognition.onstart = () => {
+        isRecording = true;
+        btnMic.classList.add('mic-recording', 'bg-rose-600', 'text-white');
+        micLabel.textContent = "Đang nghe...";
+        micStatus.textContent = "🔴 Hãy nói tiếng Anh rõ ràng vào micro...";
+      };
+
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        inputEl.value = transcript;
+      };
+
+      recognition.onerror = (event) => {
+        isRecording = false;
+        resetMicUI();
+        if (event.error === 'not-allowed') {
+          micStatus.textContent = "⚠️ Quyền Micro bị chặn trong khung xem trước. Bạn hãy gõ câu trả lời bên cạnh nhé!";
+        } else {
+          micStatus.textContent = "⚠️ Không nghe rõ giọng nói. Thử lại hoặc gõ phím nhé!";
+        }
+      };
+
+      recognition.onend = () => {
+        isRecording = false;
+        resetMicUI();
+        if (inputEl.value.trim().length > 0) {
+          micStatus.textContent = "✅ Đã nhận diện giọng nói! Bấm Gửi hoặc chỉnh sửa nếu cần.";
+        }
+      };
+
+      try {
+        recognition.start();
+      } catch (e) {
+        resetMicUI();
+      }
+    }
+
+    function resetMicUI() {
+      const btnMic = document.getElementById('btn-mic');
+      const micLabel = document.getElementById('mic-label');
+      if (btnMic) btnMic.classList.remove('mic-recording', 'bg-rose-600', 'text-white');
+      if (micLabel) micLabel.textContent = "Bấm Để Nói";
+    }
+
+    // =========================================================================
+    // 4. GAME STATE & PERSISTENCE
+    // =========================================================================
+    const DEFAULT_STATE = {
+      xp: 0,
+      gems: 20,
+      streak: 1,
+      combo: 1.0,
+      speechRate: 1.0,
+      showTranslation: true,
+      soundEnabled: true,
+      highScoreReflex: 0,
+      phrasebook: [
+        {
+          id: "starter-1",
+          en: "Could I get an iced oat milk latte, light on the ice?",
+          vi: "Cho mình một ly latte sữa yến mạch đá, ít đá thôi nhé?",
+          context: "Gọi đồ uống tự nhiên như người bản xứ"
+        },
+        {
+          id: "starter-2",
+          en: "Not at all, go right ahead!",
+          vi: "Không phiền chút nào, bạn cứ tự nhiên!",
+          context: "Trả lời khi ai đó hỏi 'Mind if I...?'"
+        }
+      ]
+    };
+
+    let gameState = loadState();
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem('linguaquest_state_v1');
+        if (saved) return { ...DEFAULT_STATE, ...JSON.parse(saved) };
+      } catch (e) {}
+      return { ...DEFAULT_STATE };
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('linguaquest_state_v1', JSON.stringify(gameState));
+      } catch (e) {}
+      updateHUD();
+    }
+
+    function addRewards(xpAmount, gemAmount = 0) {
+      const prevLevel = Math.floor(gameState.xp / 150) + 1;
+      const finalXp = Math.round(xpAmount * gameState.combo);
+      gameState.xp += finalXp;
+      gameState.gems += gemAmount;
+      const newLevel = Math.floor(gameState.xp / 150) + 1;
+
+      saveState();
+
+      if (newLevel > prevLevel) {
+        playSound('levelup');
+        showToast(`🎉 LÊN CẤP! Bạn đã đạt Level ${newLevel}!`, "level");
+      } else {
+        showToast(`+${finalXp} XP ${gemAmount > 0 ? `• +${gemAmount} 💎` : ''}`, "xp");
+      }
+    }
+
+    function unlockPhrase(en, vi, context) {
+      const exists = gameState.phrasebook.some(p => p.en.toLowerCase() === en.toLowerCase());
+      if (!exists) {
+        gameState.phrasebook.unshift({
+          id: 'p-' + Date.now() + Math.random().toString(36).slice(2, 6),
+          en,
+          vi,
+          context
+        });
+        saveState();
+        showToast(`📒 Đã lưu cụm từ mới vào Sổ tay!`, "info");
+      }
+    }
+
+    function updateHUD() {
+      const level = Math.floor(gameState.xp / 150) + 1;
+      const currentLevelXp = gameState.xp % 150;
+      const pct = Math.min(100, Math.round((currentLevelXp / 150) * 100));
+
+      document.getElementById('hud-level').textContent = level;
+      document.getElementById('hud-xp-text').textContent = `${currentLevelXp} / 150`;
+      document.getElementById('hud-xp-bar').style.width = `${pct}%`;
+      document.getElementById('hud-streak').textContent = gameState.streak;
+      document.getElementById('hud-combo').textContent = `${gameState.combo.toFixed(1)}x`;
+      document.getElementById('hud-gems').textContent = gameState.gems;
+      document.getElementById('phrasebook-count').textContent = gameState.phrasebook.length;
+      document.getElementById('hub-reflex-best').textContent = gameState.highScoreReflex;
+
+      // Speed & Translation buttons
+      document.getElementById('speed-label').textContent = `${gameState.speechRate.toFixed(2).replace('.00', '.0')}x`;
+      const transBtn = document.getElementById('btn-trans');
+      const transLabel = document.getElementById('trans-label');
+      if (gameState.showTranslation) {
+        transBtn.className = "rpg-btn px-2.5 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-xs font-semibold text-emerald-300 flex items-center gap-1";
+        transLabel.textContent = "Dịch: Bật";
+      } else {
+        transBtn.className = "rpg-btn px-2.5 py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-400 flex items-center gap-1";
+        transLabel.textContent = "Dịch: Tắt";
+      }
+
+      document.getElementById('sound-icon').textContent = gameState.soundEnabled ? "🔔" : "🔇";
+    }
+
+    function toggleSpeechRate() {
+      playSound('click');
+      gameState.speechRate = gameState.speechRate === 1.0 ? 0.75 : 1.0;
+      saveState();
+      showToast(`Tốc độ đọc: ${gameState.speechRate === 0.75 ? '0.75x (Chậm dễ nghe)' : '1.0x (Tự nhiên)'}`, "info");
+    }
+
+    function toggleTranslation() {
+      playSound('click');
+      gameState.showTranslation = !gameState.showTranslation;
+      saveState();
+      // Re-render current chat translations immediately
+      document.querySelectorAll('.vi-translation').forEach(el => {
+        el.classList.toggle('hidden', !gameState.showTranslation);
+      });
+    }
+
+    function toggleSound() {
+      gameState.soundEnabled = !gameState.soundEnabled;
+      if (gameState.soundEnabled) playSound('click');
+      saveState();
+    }
+
+    // =========================================================================
+    // 5. STORY ROLEPLAY QUEST DATA (RICH BRANCHING TREES + SVG AVATARS)
+    // =========================================================================
+    const AVATARS = {
+      leo: `<svg viewBox="0 0 80 80" class="w-14 h-14 sm:w-16 sm:h-16"><circle cx="40" cy="40" r="36" fill="#f59e0b" opacity="0.2"/><circle cx="40" cy="34" r="16" fill="#fed7aa"/><path d="M24 30 Q40 12 56 30" fill="#78350f"/><circle cx="34" cy="33" r="2.2" fill="#1e293b"/><circle cx="46" cy="33" r="2.2" fill="#1e293b"/><path d="M35 40 Q40 45 45 40" stroke="#9a3412" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M20 72 Q40 52 60 72" fill="#059669"/><rect x="31" y="56" width="18" height="16" rx="2" fill="#fef3c7"/></svg>`,
+      clara: `<svg viewBox="0 0 80 80" class="w-14 h-14 sm:w-16 sm:h-16"><circle cx="40" cy="40" r="36" fill="#0ea5e9" opacity="0.2"/><path d="M22 36 Q22 14 40 14 Q58 14 58 36 L60 54 L20 54 Z" fill="#1e293b"/><circle cx="40" cy="34" r="15" fill="#fde68a"/><circle cx="34" cy="33" r="2.2" fill="#0f172a"/><circle cx="46" cy="33" r="2.2" fill="#0f172a"/><path d="M35 40 Q40 44 45 40" stroke="#b45309" stroke-width="2.3" fill="none" stroke-linecap="round"/><path d="M20 72 Q40 52 60 72" fill="#0284c7"/><polygon points="40,54 34,62 46,62" fill="#facc15"/></svg>`,
+      julian: `<svg viewBox="0 0 80 80" class="w-14 h-14 sm:w-16 sm:h-16"><circle cx="40" cy="40" r="36" fill="#a855f7" opacity="0.2"/><circle cx="40" cy="34" r="16" fill="#ffedd5"/><path d="M24 28 Q32 16 56 26" fill="#334155"/><rect x="28" y="29" width="10" height="7" rx="2" stroke="#1e293b" stroke-width="2" fill="none"/><rect x="42" y="29" width="10" height="7" rx="2" stroke="#1e293b" stroke-width="2" fill="none"/><line x1="38" y1="32" x2="42" y2="32" stroke="#1e293b" stroke-width="2"/><path d="M36 41 Q40 43 44 41" stroke="#7c2d12" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M20 72 Q40 52 60 72" fill="#581c87"/></svg>`,
+      ai: `<svg viewBox="0 0 80 80" class="w-14 h-14 sm:w-16 sm:h-16"><circle cx="40" cy="40" r="36" fill="#6366f1" opacity="0.25"/><rect x="22" y="22" width="36" height="32" rx="10" fill="#1e1b4b" stroke="#818cf8" stroke-width="2.5"/><circle cx="33" cy="36" r="3.5" fill="#34d399"/><circle cx="47" cy="36" r="3.5" fill="#34d399"/><path d="M33 45 Q40 50 47 45" stroke="#818cf8" stroke-width="2.5" fill="none" stroke-linecap="round"/><line x1="40" y1="12" x2="40" y2="22" stroke="#818cf8" stroke-width="2.5"/><circle cx="40" cy="11" r="3.5" fill="#34d399"/></svg>`
+    };
+
+    const QUESTS_DATA = {
+      coffee: {
+        id: 'coffee',
+        badge: 'Quest 1 • Beginner',
+        title: 'The Hidden Coffee Shop',
+        npcName: 'Leo',
+        npcRole: 'Barista thân thiện',
+        avatarKey: 'leo',
+        objective: 'Gọi đồ uống tùy chỉnh & trò chuyện tự nhiên cùng Leo.',
+        steps: [
+          {
+            npcEn: "Hey there! Welcome to Velvet Bean. What can I get started for you today?",
+            npcVi: "Chào bạn! Chào mừng đến với Velvet Bean. Hôm nay mình pha gì cho bạn nhé?",
+            mood: "😊 Niềm nở",
+            options: [
+              {
+                en: "Could I get an iced oat milk latte, light on the ice, please?",
+                vi: "Cho mình một ly latte sữa yến mạch đá, ít đá thôi nhé?",
+                quality: "native",
+                xp: 45,
+                gems: 5,
+                npcReactionEn: "Ooh, great choice! Oat milk makes it super creamy. Coming right up!",
+                npcReactionVi: "Ồ, lựa chọn tuyệt đấy! Sữa yến mạch làm cà phê béo ngậy cực kỳ. Có ngay đây!",
+                feedbackVi: "🌟 Chuẩn bản xứ! Dùng 'Could I get...' lịch sự hơn 'I want...', và 'light on the ice' là cụm từ cực tự nhiên để xin ít đá.",
+                unlockContext: "Gọi đồ uống ít đá tại quán cà phê"
+              },
+              {
+                en: "Can I have one iced coffee with milk, please?",
+                vi: "Cho tôi một cà phê sữa đá được không ạ?",
+                quality: "good",
+                xp: 30,
+                gems: 2,
+                npcReactionEn: "Sure thing! One iced milk coffee coming up.",
+                npcReactionVi: "Được chứ! Một ly cà phê sữa đá có ngay.",
+                feedbackVi: "👍 Khá tốt và lịch sự! Tuy nhiên ở quán Âu-Mỹ, bạn có thể dùng 'iced latte' hoặc 'iced coffee with milk, light ice' sẽ tự nhiên hơn nữa.",
+                unlockContext: "Gọi đồ uống lịch sự cơ bản"
+              },
+              {
+                en: "I want drink one coffee milk ice now.",
+                vi: "Tôi muốn uống một cà phê sữa đá bây giờ.",
+                quality: "awkward",
+                xp: 10,
+                gems: 0,
+                npcReactionEn: "Uh, sure... one iced coffee with milk, I suppose?",
+                npcReactionVi: "Ờ, được thôi... ý bạn là một cà phê sữa đá nhỉ?",
+                feedbackVi: "⚠️ Bẫy dịch từng chữ (Word-for-word)! Người bản xứ không nói 'I want drink...'. Hãy thay bằng 'Can I have...' hoặc 'Could I get...'.",
+                unlockContext: null
+              }
+            ]
+          },
+          {
+            npcEn: "Want anything to eat with that? Our almond croissants just came out of the oven!",
+            npcVi: "Bạn có muốn dùng thêm gì ăn kèm không? Bánh sừng bò hạnh nhân vừa mới ra lò luôn đấy!",
+            mood: "🤩 Hào hứng",
+            options: [
+              {
+                en: "I'm good for now, thanks! Just the coffee for me.",
+                vi: "Hiện tại mình ổn rồi, cảm ơn bạn! Mình chỉ lấy cà phê thôi.",
+                quality: "native",
+                xp: 45,
+                gems: 5,
+                npcReactionEn: "No problem at all! Just the latte then.",
+                npcReactionVi: "Không vấn đề gì! Vậy chỉ một ly latte thôi nhé.",
+                feedbackVi: "🌟 Cực kỳ tự nhiên! Thay vì nói 'No, I don't want', người bản xứ hay dùng 'I'm good, thanks!' để từ chối khéo lời mời.",
+                unlockContext: "Từ chối khéo lời mời gọi thêm món"
+              },
+              {
+                en: "Oh, that sounds tempting! Throw in one almond croissant, please.",
+                vi: "Ồ nghe hấp dẫn quá! Cho mình thêm một cái bánh sừng bò hạnh nhân nhé.",
+                quality: "native",
+                xp: 50,
+                gems: 6,
+                npcReactionEn: "Awesome! You are going to love it while it's still warm.",
+                npcReactionVi: "Tuyệt vời! Bạn sẽ mê tít khi bánh còn đang ấm nóng đấy.",
+                feedbackVi: "🌟 Xuất sắc! Cụm 'Throw in...' (lấy thêm cho mình...) nghe rất đời thường và thân thiện khi gọi thêm món.",
+                unlockContext: "Gọi thêm món ăn kèm tự nhiên"
+              },
+              {
+                en: "No, I no hungry. Thank you.",
+                vi: "Không, tôi không đói. Cảm ơn.",
+                quality: "awkward",
+                xp: 10,
+                gems: 0,
+                npcReactionEn: "Alrighty, just the drink then.",
+                npcReactionVi: "Được rồi, vậy chỉ đồ uống thôi nhé.",
+                feedbackVi: "⚠️ Thiếu động từ to-be ('I'm not hungry') và nghe hơi cộc. Hãy thử dùng 'I'm good, thanks!' nhé.",
+                unlockContext: null
+              }
+            ]
+          },
+          {
+            npcEn: "Are you having it here or taking it to go? By the way, our Wi-Fi password is on the receipt.",
+            npcVi: "Bạn dùng tại quán hay mang đi nhỉ? À, mật khẩu Wi-Fi nằm trên hóa đơn nhé.",
+            mood: "😊 Thân thiện",
+            options: [
+              {
+                en: "I'll have it to go, thanks for the heads-up!",
+                vi: "Mình mang đi nhé, cảm ơn bạn đã nhắc!",
+                quality: "native",
+                xp: 50,
+                gems: 6,
+                npcReactionEn: "You got it! Here's your order. Have an awesome rest of your day!",
+                npcReactionVi: "Có ngay đây! Đồ của bạn này. Chúc bạn phần còn lại của ngày thật tuyệt vời!",
+                feedbackVi: "🌟 Đỉnh cao giao tiếp! 'To go' (mang đi) / 'For here' (tại quán) và 'Thanks for the heads-up!' (Cảm ơn đã báo trước/nhắc nhé) dùng cực kỳ đắt giá.",
+                unlockContext: "Cảm ơn ai đó đã nhắc nhở thông tin hữu ích"
+              },
+              {
+                en: "For here, please. I'm going to get some work done.",
+                vi: "Mình uống tại quán nhé. Mình định ngồi làm chút việc.",
+                quality: "good",
+                xp: 35,
+                gems: 3,
+                npcReactionEn: "Feel free to grab that corner booth, it has power outlets!",
+                npcReactionVi: "Cứ tự nhiên ngồi góc bàn kia nhé, chỗ đó có ổ cắm điện đấy!",
+                feedbackVi: "👍 Rất tự nhiên! 'For here' là cách nói chuẩn khi uống tại quán, và 'get some work done' là cụm từ chuẩn để nói 'làm chút việc'.",
+                unlockContext: "Nói về việc ngồi làm việc tại quán"
+              },
+              {
+                en: "I bring go home. Thank you very much.",
+                vi: "Tôi mang đi về nhà. Cảm ơn rất nhiều.",
+                quality: "awkward",
+                xp: 10,
+                gems: 0,
+                npcReactionEn: "Gotcha, to go! Here you go.",
+                npcReactionVi: "Hiểu rồi, mang đi nhé! Của bạn đây.",
+                feedbackVi: "⚠️ 'Bring go home' là cách dịch từ tiếng Việt. Chỉ cần nói ngắn gọn 'To go, please!' là chuẩn Mỹ nhất.",
+                unlockContext: null
+              }
+            ]
+          }
+        ]
+      },
+
+      airport: {
+        id: 'airport',
+        badge: 'Quest 2 • Elementary',
+        title: 'Airport Adventure',
+        npcName: 'Clara',
+        npcRole: 'Nhân viên Check-in',
+        avatarKey: 'clara',
+        objective: 'Hoàn tất thủ tục ký gửi hành lý & xin ghế cửa sổ thuận lợi.',
+        steps: [
+          {
+            npcEn: "Good afternoon! May I see your passport and booking confirmation, please?",
+            npcVi: "Chào buổi chiều! Cho mình xem hộ chiếu và xác nhận đặt vé của bạn nhé?",
+            mood: "🙂 Chuyên nghiệp",
+            options: [
+              {
+                en: "Sure, here you go. I also have one bag to check in.",
+                vi: "Vâng, của bạn đây. Mình cũng có một kiện hành lý cần ký gửi.",
+                quality: "native",
+                xp: 50,
+                gems: 5,
+                npcReactionEn: "Thank you! Go ahead and place your suitcase on the scale for me.",
+                npcReactionVi: "Cảm ơn bạn! Mời bạn đặt vali lên bàn cân giúp mình nhé.",
+                feedbackVi: "🌟 Tự nhiên và chủ động! 'Here you go' (khi đưa đồ cho ai) + 'check in a bag' (ký gửi hành lý) rất mượt mà.",
+                unlockContext: "Đưa giấy tờ và báo ký gửi hành lý ở sân bay"
+              },
+              {
+                en: "Yes, this is my passport. I have luggage.",
+                vi: "Vâng, đây là hộ chiếu của tôi. Tôi có hành lý.",
+                quality: "good",
+                xp: 30,
+                gems: 2,
+                npcReactionEn: "Alright, please put your bag on the belt.",
+                npcReactionVi: "Được rồi, vui lòng đặt túi lên băng chuyền nhé.",
+                feedbackVi: "👍 Đúng ngữ pháp nhưng hơi khô. Thêm 'Here you go' sẽ nghe thân thiện và tự nhiên hơn nhiều.",
+                unlockContext: null
+              },
+              {
+                en: "Passport here. Send big bag.",
+                vi: "Hộ chiếu đây. Gửi túi to.",
+                quality: "awkward",
+                xp: 10,
+                gems: 0,
+                npcReactionEn: "I see... please put your checked luggage on the scale.",
+                npcReactionVi: "Tôi hiểu rồi... vui lòng đặt hành lý ký gửi lên cân.",
+                feedbackVi: "⚠️ Câu quá cụt lủn! Hãy dùng câu hoàn chỉnh: 'Here you go. I have one bag to check in.'",
+                unlockContext: null
+              }
+            ]
+          },
+          {
+            npcEn: "Everything looks good. Do you have a seat preference—window or aisle?",
+            npcVi: "Mọi thứ đều ổn rồi. Bạn thích ngồi ghế nào—cửa sổ hay lối đi?",
+            mood: "😊 Vui vẻ",
+            options: [
+              {
+                en: "If there's a window seat available, I'd love that!",
+                vi: "Nếu còn ghế cửa sổ trống thì mình thích ghế đó lắm!",
+                quality: "native",
+                xp: 55,
+                gems: 6,
+                npcReactionEn: "You're in luck! Seat 14A is wide open. I've assigned that to you.",
+                npcReactionVi: "Bạn may mắn đấy! Ghế 14A vẫn trống. Mình đã xếp ghế đó cho bạn rồi.",
+                feedbackVi: "🌟 Rất lịch sự và bản xứ! 'If there's ... available, I'd love that' giúp lời đề nghị nhẹ nhàng và dễ được ưu tiên.",
+                unlockContext: "Xin ghế cửa sổ lịch sự khi check-in"
+              },
+              {
+                en: "I want sit near window, please.",
+                vi: "Tôi muốn ngồi gần cửa sổ, làm ơn.",
+                quality: "awkward",
+                xp: 15,
+                gems: 0,
+                npcReactionEn: "Okay, let me see if I can get you a window seat.",
+                npcReactionVi: "Được, để tôi xem có xếp được ghế cửa sổ cho bạn không.",
+                feedbackVi: "⚠️ Sau 'want' phải có 'to' ('want to sit') và dùng danh từ ghép 'window seat' (ghế cửa sổ) thay vì 'near window'.",
+                unlockContext: null
+              },
+              {
+                en: "An aisle seat would be great so I can stretch my legs.",
+                vi: "Ghế lối đi sẽ rất tuyệt để mình có thể duỗi chân.",
+                quality: "native",
+                xp: 55,
+                gems: 6,
+                npcReactionEn: "Smart thinking for a long flight! You're in 14C.",
+                npcReactionVi: "Suy nghĩ thông minh cho chuyến bay dài đấy! Bạn ngồi ghế 14C nhé.",
+                feedbackVi: "🌟 Cực hay! Cụm 'stretch my legs' (duỗi chân cho đỡ mỏi) là thành ngữ giao tiếp rất phổ biến khi đi máy bay.",
+                unlockContext: "Giải thích lý do chọn ghế lối đi trên máy bay"
+              }
+            ]
+          },
+          {
+            npcEn: "Here is your boarding pass. Boarding starts at 3:15 PM at Gate B4. Have a safe flight!",
+            npcVi: "Thẻ lên máy bay của bạn đây. Giờ lên tàu bắt đầu lúc 3:15 chiều tại Cổng B4. Chúc bạn bay bình an!",
+            mood: "✈️ Tận tâm",
+            options: [
+              {
+                en: "Thanks so much for your help! Have a great shift.",
+                vi: "Cảm ơn bạn rất nhiều vì đã hỗ trợ! Chúc bạn ca làm việc vui vẻ.",
+                quality: "native",
+                xp: 60,
+                gems: 8,
+                npcReactionEn: "Aw, thank you! Enjoy your trip!",
+                npcReactionVi: "Ôi cảm ơn bạn nhé! Chúc chuyến đi vui vẻ!",
+                feedbackVi: "🌟 Đỉnh cao EQ! Chúc nhân viên 'Have a great shift' (Chúc ca làm việc tốt lành) khiến người bản xứ cực kỳ ấn tượng.",
+                unlockContext: "Lời cảm ơn tinh tế dành cho nhân viên dịch vụ"
+              },
+              {
+                en: "Thank you, goodbye!",
+                vi: "Cảm ơn bạn, tạm biệt!",
+                quality: "good",
+                xp: 35,
+                gems: 3,
+                npcReactionEn: "You're welcome! Safe travels!",
+                npcReactionVi: "Không có gì! Thượng lộ bình an nhé!",
+                feedbackVi: "👍 Lịch sự, đúng chuẩn. Bạn có thể nâng cấp thành 'Thanks so much for your help!' để nghe ấm áp hơn.",
+                unlockContext: null
+              },
+              {
+                en: "Okay, I go B4 now.",
+                vi: "Được rồi, tôi đi B4 bây giờ.",
+                quality: "awkward",
+                xp: 10,
+                gems: 0,
+                npcReactionEn: "Yes, follow the signs to Gate B4.",
+                npcReactionVi: "Vâng, hãy đi theo biển chỉ dẫn tới Cổng B4.",
+                feedbackVi: "⚠️ Quên cảm ơn và thiếu giới từ ('head to Gate B4'). Hãy tập thói quen cảm ơn nhân viên nhé!",
+                unlockContext: null
+              }
+            ]
+          }
+        ]
+      },
+
+      hotel: {
+        id: 'hotel',
+        badge: 'Quest 3 • Intermediate',
+        title: 'Hotel Mystery',
+        npcName: 'Julian',
+        npcRole: 'Quản lý tiền sảnh (Concierge)',
+        avatarKey: 'julian',
+        objective: 'Dùng câu hỏi gián tiếp lịch sự để tìm lại chiếc vali bị tráo nhầm.',
+        steps: [
+          {
+            npcEn: "Good evening! Welcome to The Grand Aurelia. How may I assist you tonight?",
+            npcVi: "Chào buổi tối! Chào mừng đến với The Grand Aurelia. Tối nay tôi có thể hỗ trợ gì cho quý khách?",
+            mood: "🧐 Lịch lãm",
+            options: [
+              {
+                en: "Hi Julian, I hate to bother you, but I think my suitcase got mixed up with someone else's.",
+                vi: "Chào Julian, ngại làm phiền bạn quá, nhưng hình như vali của mình bị nhầm với của ai đó rồi.",
+                quality: "native",
+                xp: 70,
+                gems: 8,
+                npcReactionEn: "Oh dear! Please don't apologize—that's what I'm here for. What kind of bag was delivered to your room?",
+                npcReactionVi: "Ôi trời! Xin đừng ngại—đó là nhiệm vụ của tôi mà. Chiếc túi được giao lên phòng bạn trông như thế nào?",
+                feedbackVi: "🌟 Bậc thầy giao tiếp! 'I hate to bother you, but...' (Ngại làm phiền nhưng...) + 'got mixed up' (bị nhầm lẫn) cực kỳ tự nhiên và lịch thiệp.",
+                unlockContext: "Mở lời báo sự cố một cách lịch sự, tinh tế"
+              },
+              {
+                en: "Excuse me, my luggage is wrong. This is not my bag.",
+                vi: "Xin lỗi, hành lý của tôi bị sai. Đây không phải túi của tôi.",
+                quality: "good",
+                xp: 40,
+                gems: 3,
+                npcReactionEn: "I see. Let's look into that right away. What is inside the bag you received?",
+                npcReactionVi: "Tôi hiểu rồi. Hãy kiểm tra ngay nhé. Bên trong chiếc túi bạn nhận được có gì?",
+                feedbackVi: "👍 Truyền đạt đúng ý, nhưng hơi trực diện. Dùng 'got mixed up' sẽ mềm mỏng hơn 'is wrong'.",
+                unlockContext: null
+              },
+              {
+                en: "Hey! Why you give me wrong suitcase?",
+                vi: "Này! Tại sao anh đưa tôi nhầm vali?",
+                quality: "awkward",
+                xp: 10,
+                gems: 0,
+                npcReactionEn: "I sincerely apologize for the confusion. Let me sort this out immediately.",
+                npcReactionVi: "Tôi thành thật xin lỗi vì sự nhầm lẫn này. Để tôi giải quyết ngay lập tức.",
+                feedbackVi: "⚠️ Câu hỏi 'Why you give...' vừa sai ngữ pháp vừa mang tính buộc tội gay gắt. Trong tiếng Anh giao tiếp, nên dùng câu gián tiếp.",
+                unlockContext: null
+              }
+            ]
+          },
+          {
+            npcEn: "A black trunk filled with... rubber chickens and magic wands?! Haha, that belongs to The Great Houdini performing downstairs!",
+            npcVi: "Một chiếc rương đen chứa đầy... gà cao su và đũa thần à?! Haha, đó là của ảo thuật gia Houdini đang diễn ở tầng dưới!",
+            mood: "😂 Bật cười",
+            options: [
+              {
+                en: "Haha, that explains it! Would you happen to know if my navy blue suitcase went to his dressing room?",
+                vi: "Haha, thảo nào! Bạn có tình cờ biết chiếc vali xanh navy của mình có bị chuyển nhầm sang phòng thay đồ của anh ấy không?",
+                quality: "native",
+                xp: 75,
+                gems: 9,
+                npcReactionEn: "Brilliant deduction! Let me ring backstage right now—yes! They have a navy suitcase right there!",
+                npcReactionVi: "Suy luận xuất sắc! Để tôi gọi hậu trường ngay—đúng rồi! Họ đang giữ một chiếc vali xanh navy ở đó!",
+                feedbackVi: "🌟 Cấu trúc 'Would you happen to know if...' (Bạn có tình cờ biết liệu rằng...) là mẫu câu hỏi gián tiếp chuẩn C1 cực kỳ thanh lịch.",
+                unlockContext: "Đặt câu hỏi gián tiếp lịch sự (Would you happen to know...)"
+              },
+              {
+                en: "Oh funny! Can you check if my blue bag is with him?",
+                vi: "Ồ buồn cười thật! Bạn kiểm tra xem túi xanh của tôi có ở chỗ anh ấy không?",
+                quality: "good",
+                xp: 45,
+                gems: 4,
+                npcReactionEn: "Certainly! Let me call backstage... Yes, they found your navy suitcase!",
+                npcReactionVi: "Chắc chắn rồi! Để tôi gọi xuống hậu trường... Vâng, họ tìm thấy vali xanh navy của bạn rồi!",
+                feedbackVi: "👍 Giao tiếp ổn! Nếu nâng cấp 'Can you check' thành 'Would you mind checking' sẽ còn sang trọng hơn.",
+                unlockContext: null
+              },
+              {
+                en: "Give me back my blue bag fast!",
+                vi: "Trả lại túi xanh cho tôi nhanh lên!",
+                quality: "awkward",
+                xp: 10,
+                gems: 0,
+                npcReactionEn: "Right away, sir/madam. I am calling backstage now.",
+                npcReactionVi: "Ngay lập tức thưa quý khách. Tôi đang gọi xuống hậu trường đây.",
+                feedbackVi: "⚠️ Mệnh lệnh 'Give me back... fast!' nghe khá thô lỗ. Hãy dùng 'Could we have someone bring it up?'",
+                unlockContext: null
+              }
+            ]
+          },
+          {
+            npcEn: "The bellhop is bringing your suitcase up right now, along with two complimentary VIP show tickets for the trouble!",
+            npcVi: "Nhân viên hành lý đang mang vali lên cho bạn ngay đây, kèm theo hai vé xem show VIP miễn phí để tạ lỗi nhé!",
+            mood: "🎉 Giải quyết êm đẹp",
+            options: [
+              {
+                en: "That's way too kind of you! Thanks for sorting this out so quickly.",
+                vi: "Bạn chu đáo quá đi mất! Cảm ơn vì đã giải quyết mọi chuyện nhanh gọn như vậy.",
+                quality: "native",
+                xp: 80,
+                gems: 10,
+                npcReactionEn: "My absolute pleasure! Enjoy the magic show tonight!",
+                npcReactionVi: "Niềm vinh hạnh của tôi! Chúc bạn xem show ảo thuật tối nay thật vui!",
+                feedbackVi: "🌟 Tuyệt vời! 'Sort something out' (giải quyết ổn thỏa vấn đề) là phrasal verb cực kỳ hữu dụng trong đời sống.",
+                unlockContext: "Cảm ơn ai đó đã giải quyết ổn thỏa sự cố"
+              },
+              {
+                en: "Thank you for the tickets and helping me.",
+                vi: "Cảm ơn vì những tấm vé và đã giúp tôi.",
+                quality: "good",
+                xp: 45,
+                gems: 4,
+                npcReactionEn: "You're very welcome! Have a wonderful stay.",
+                npcReactionVi: "Không có gì ạ! Chúc quý khách kỳ nghỉ tuyệt vời.",
+                feedbackVi: "👍 Tốt và chân thành! Ghi nhớ thêm cụm 'sorting this out' để vốn từ phong phú hơn nhé.",
+                unlockContext: null
+              },
+              {
+                en: "Good, I take tickets.",
+                vi: "Tốt, tôi lấy vé.",
+                quality: "awkward",
+                xp: 10,
+                gems: 0,
+                npcReactionEn: "Here are your tickets. Enjoy.",
+                npcReactionVi: "Vé của bạn đây. Chúc vui vẻ.",
+                feedbackVi: "⚠️ Thiếu mạo từ ('the tickets') và thiếu lời cảm ơn khi nhận quà tặng.",
+                unlockContext: null
+              }
+            ]
+          }
+        ]
+      }
+    };
+
+    // =========================================================================
+    // 6. SPEED REFLEX 60S QUESTION BANK (ANTI-VIET-ENGLISH TRAPS)
+    // =========================================================================
+    const REFLEX_QUESTIONS = [
+      {
+        context: "Bạn bè gặp nhau lâu ngày",
+        en: "What have you been up to lately?",
+        vi: "Dạo này bạn đang làm gì / bận chuyện gì thế?",
+        options: [
+          { text: "Not much, just keeping busy with work!", correct: true, note: "Chuẩn bản xứ! 'Not much, just...' là cách đáp tự nhiên nhất." },
+          { text: "I go up to the second floor.", correct: false, note: "Bẫy dịch nghĩa đen! 'Be up to' nghĩa là 'đang làm gì', không phải đi lên lầu." },
+          { text: "I'm fine, thank you, and you?", correct: false, note: "Quá sách giáo khoa và không khớp câu hỏi 'làm gì'!" },
+          { text: "Yes, I have been up.", correct: false, note: "Sai ngữ cảnh hoàn toàn." }
+        ]
+      },
+      {
+        context: "Ở quán cà phê đông người",
+        en: "Mind if I grab this chair?",
+        vi: "Có phiền không nếu mình lấy chiếc ghế này?",
+        options: [
+          { text: "Not at all, go right ahead!", correct: true, note: "Chính xác! 'Mind if...' hỏi có phiền không, nên 'Not at all' = Không phiền, cứ lấy đi." },
+          { text: "Yes, you can grab it.", correct: false, note: "Bẫy kinh điển! Trả lời 'Yes' với 'Mind if...' nghĩa là 'Có, tôi thấy phiền đấy!'" },
+          { text: "No, don't grab my chair.", correct: false, note: "Nghe hơi căng thẳng nếu ghế đang trống." },
+          { text: "I mind very much, take it.", correct: false, note: "Mâu thuẫn ý nghĩa!" }
+        ]
+      },
+      {
+        context: "Đồng nghiệp cảm ơn bạn",
+        en: "Thanks a ton for covering my shift!",
+        vi: "Cảm ơn bạn nhiều lắm vì đã làm thay ca cho mình!",
+        options: [
+          { text: "Anytime! Happy to help.", correct: true, note: "Cực kỳ tự nhiên và thân thiện ('Anytime!' = Lúc nào cũng sẵn lòng!)." },
+          { text: "Nothing, don't mention.", correct: false, note: "Dịch từng chữ từ 'Không có gì, đừng nhắc tới' -> Sai cụm ('Don't mention it')." },
+          { text: "You must pay me back.", correct: false, note: "Nghe hơi sòng phẳng quá mức trong giao tiếp thường ngày." },
+          { text: "Yes, I am very good.", correct: false, note: "Không tự nhiên khi đáp lại lời cảm ơn." }
+        ]
+      },
+      {
+        context: "Nhà hàng bít tết (Steakhouse)",
+        en: "How would you like your steak cooked?",
+        vi: "Quý khách muốn bít tết chín mức nào ạ?",
+        options: [
+          { text: "Medium-rare, please.", correct: true, note: "Chuẩn xác! Các mức chín: Rare, Medium-rare, Medium, Well-done." },
+          { text: "I like it very delicious.", correct: false, note: "Không trả lời đúng câu hỏi về độ chín của thịt." },
+          { text: "Cook by fire, please.", correct: false, note: "Dịch word-by-word gây buồn cười." },
+          { text: "Half raw half cook.", correct: false, note: "Cách nói chuẩn cho chín tái vừa là 'Medium-rare'." }
+        ]
+      },
+      {
+        context: "Gặp đồng nghiệp ở hành lang",
+        en: "How's it going?",
+        vi: "Dạo này mọi thứ thế nào rồi?",
+        options: [
+          { text: "Pretty good! How about yourself?", correct: true, note: "Mượt mà, tự nhiên đúng chất người bản xứ." },
+          { text: "It is going by motorbike.", correct: false, note: "Bẫy! 'How's it going' = 'How are you', không phải hỏi phương tiện đi lại." },
+          { text: "I'm fine, thank you, and you?", correct: false, note: "Câu trả lời robot sách giáo khoa cũ." },
+          { text: "Going to the office.", correct: false, note: "Hiểu nhầm câu hỏi thành 'Where are you going?'" }
+        ]
+      },
+      {
+        context: "Khi bạn làm rơi đồ của ai đó",
+        en: "Oh, don't worry about it! No harm done.",
+        vi: "Ồ đừng lo! Không có gì hư hại đâu.",
+        options: [
+          { text: "Appreciate it! Let me know if anything's scratched.", correct: true, note: "Lịch sự, tinh tế và rất tự nhiên." },
+          { text: "Yes, I don't worry.", correct: false, note: "Nghe hơi vô tâm khi vừa làm rơi đồ người khác!" },
+          { text: "Why you say no harm?", correct: false, note: "Sai ngữ pháp và phản ứng kỳ lạ." },
+          { text: "Okay, bye-bye.", correct: false, note: "Quá cộc lốc." }
+        ]
+      },
+      {
+        context: "Rủ bạn đi ăn trưa",
+        en: "Are you down for Thai food today?",
+        vi: "Hôm nay bạn có hứng đi ăn đồ Thái không?",
+        options: [
+          { text: "I'm totally down! Let's go.", correct: true, note: "'Be down for something' = Hào hứng tham gia chuyện gì đó!" },
+          { text: "No, I am sitting up.", correct: false, note: "Bẫy từ vựng! 'Down for' ở đây không có nghĩa là 'ở dưới'." },
+          { text: "Thai food is down the street.", correct: false, note: "Hiểu nhầm nghĩa của từ 'down'." },
+          { text: "I don't down.", correct: false, note: "Sai cấu trúc tiếng Anh." }
+        ]
+      },
+      {
+        context: "Thanh toán tại quầy thu ngân",
+        en: "Will that be cash or card?",
+        vi: "Bạn thanh toán bằng tiền mặt hay thẻ ạ?",
+        options: [
+          { text: "I'll pay by card, please.", correct: true, note: "Ngắn gọn, chuẩn xác ('by card' hoặc 'with a card')." },
+          { text: "I use paper money.", correct: false, note: "Tiền mặt là 'cash', không gọi là 'paper money'." },
+          { text: "Card is more handsome.", correct: false, note: "Vô nghĩa trong ngữ cảnh thanh toán." },
+          { text: "Yes, cash or card.", correct: false, note: "Câu hỏi lựa chọn A hoặc B thì không trả lời Yes/No!" }
+        ]
+      },
+      {
+        context: "Khi không nghe rõ người khác nói",
+        en: "Sorry, could you catch that? The music is loud.",
+        vi: "Xin lỗi, bạn có nghe rõ không? Nhạc ồn quá.",
+        options: [
+          { text: "Sorry, I missed that—could you say it again?", correct: true, note: "'I missed that' = Mình nghe lỡ mất câu đó rồi, cực kỳ tự nhiên!" },
+          { text: "I cannot catch the music.", correct: false, note: "'Catch that' nghĩa là nghe/nắm bắt được lời nói." },
+          { text: "Speak big voice please!", correct: false, note: "Dịch từ 'nói to lên' -> Nên dùng 'speak up'." },
+          { text: "My ear is broken.", correct: false, note: "Cách nói không tự nhiên." }
+        ]
+      },
+      {
+        context: "Chào tạm biệt cuối ngày thứ Sáu",
+        en: "Have a great weekend! Catch you on Monday.",
+        vi: "Cuối tuần vui vẻ nhé! Thứ Hai gặp lại.",
+        options: [
+          { text: "You too! Have a good one.", correct: true, note: "'Have a good one!' là câu chúc cửa miệng cực kỳ phổ biến của người Mỹ." },
+          { text: "Catch what on Monday?", correct: false, note: "'Catch you later/on Monday' = Hẹn gặp lại nhé!" },
+          { text: "Same to you, thank you teacher.", correct: false, note: "Không phù hợp bối cảnh đồng nghiệp/bạn bè." },
+          { text: "Monday is very tired.", correct: false, note: "Lệch chủ đề lời chúc." }
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // 7. NAVIGATION & QUEST ENGINE
+    // =========================================================================
+    let activeQuest = null;
+    let currentStepIndex = 0;
+    let isAIMode = false;
+    let aiScenarioContext = "";
+    let aiTurnCount = 0;
+    let lastNpcLineEn = "";
+
+    function navigateTo(viewName) {
+      playSound('click');
+      ['view-hub', 'view-ai-setup', 'view-quest', 'view-reflex'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(`view-${viewName}`).classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function startQuest(questId) {
+      isAIMode = false;
+      activeQuest = QUESTS_DATA[questId];
+      currentStepIndex = 0;
+
+      document.getElementById('quest-badge').textContent = activeQuest.badge;
+      document.getElementById('quest-title').textContent = activeQuest.title;
+      document.getElementById('npc-name').textContent = activeQuest.npcName;
+      document.getElementById('npc-role').textContent = `• ${activeQuest.npcRole}`;
+      document.getElementById('quest-objective').textContent = `🎯 Nhiệm vụ: ${activeQuest.objective}`;
+      document.getElementById('npc-avatar-box').innerHTML = AVATARS[activeQuest.avatarKey];
+
+      // Show choice tabs in story quests
+      document.getElementById('input-mode-tabs').classList.remove('hidden');
+      switchInputMode('choice');
+
+      // Clear chat feed & coaching
+      document.getElementById('chat-feed').innerHTML = '';
+      document.getElementById('coaching-card').classList.add('hidden');
+      document.getElementById('next-turn-container').classList.add('hidden');
+
+      navigateTo('quest');
+      renderQuestStep();
+    }
+
+    function renderQuestStep() {
+      const step = activeQuest.steps[currentStepIndex];
+      document.getElementById('npc-mood').textContent = step.mood;
+
+      // Render progress dots
+      const dotsContainer = document.getElementById('quest-progress-dots');
+      dotsContainer.innerHTML = activeQuest.steps.map((_, idx) => {
+        const activeClass = idx < currentStepIndex ? 'bg-emerald-400 w-5' : (idx === currentStepIndex ? 'bg-indigo-400 w-6' : 'bg-slate-700 w-3');
+        return `<span class="h-2 rounded-full transition-all ${activeClass}"></span>`;
+      }).join('');
+
+      // Append NPC message bubble
+      appendChatBubble('npc', activeQuest.npcName, step.npcEn, step.npcVi);
+      lastNpcLineEn = step.npcEn;
+      speakText(step.npcEn);
+
+      // Render Choice Cards
+      const panelChoices = document.getElementById('panel-choices');
+      // Shuffle options slightly for replayability
+      const shuffledOptions = [...step.options].sort(() => Math.random() - 0.5);
+
+      panelChoices.innerHTML = shuffledOptions.map((opt, i) => `
+        <div class="group flex items-stretch gap-2">
+          <button onclick='handleChoiceSelect(${JSON.stringify(opt).replace(/'/g, "&#39;")})' class="rpg-btn flex-1 text-left p-3.5 rounded-2xl bg-slate-900/95 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/60 transition-all">
+            <div class="font-bold text-sm text-white group-hover:text-indigo-200">${opt.en}</div>
+            <div class="vi-translation text-xs text-slate-400 mt-1 ${gameState.showTranslation ? '' : 'hidden'}">${opt.vi}</div>
+          </button>
+          <button onclick="speakText('${opt.en.replace(/'/g, "\\'")}')" class="rpg-btn px-3 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-indigo-300 text-sm flex items-center justify-center" title="Nghe thử câu này">
+            🔊
+          </button>
+        </div>
+      `).join('');
+
+      document.getElementById('panel-choices').classList.remove('pointer-events-none', 'opacity-50');
+      document.getElementById('coaching-card').classList.add('hidden');
+      document.getElementById('next-turn-container').classList.add('hidden');
+    }
+
+    function handleChoiceSelect(opt) {
+      // Disable further clicks on current choices
+      document.getElementById('panel-choices').classList.add('pointer-events-none', 'opacity-50');
+
+      // Append Player bubble
+      appendChatBubble('player', 'Bạn', opt.en, opt.vi);
+
+      // Update combo & rewards
+      if (opt.quality === 'native') {
+        playSound('success');
+        gameState.combo = Math.min(3.0, Number((gameState.combo + 0.2).toFixed(1)));
+        addRewards(opt.xp, opt.gems);
+        if (opt.unlockContext) unlockPhrase(opt.en, opt.vi, opt.unlockContext);
+      } else if (opt.quality === 'good') {
+        playSound('success');
+        addRewards(opt.xp, opt.gems);
+        if (opt.unlockContext) unlockPhrase(opt.en, opt.vi, opt.unlockContext);
+      } else {
+        playSound('error');
+        gameState.combo = 1.0;
+        addRewards(opt.xp, 0);
+      }
+
+      // Show Coaching Feedback
+      showCoachingFeedback({
+        score: opt.quality === 'native' ? 5 : (opt.quality === 'good' ? 4 : 2),
+        feedbackVi: opt.feedbackVi,
+        nativeEn: opt.quality === 'awkward' ? activeQuest.steps[currentStepIndex].options.find(o => o.quality === 'native')?.en : null,
+        nativeVi: opt.quality === 'awkward' ? activeQuest.steps[currentStepIndex].options.find(o => o.quality === 'native')?.vi : null
+      });
+
+      // Append NPC Reaction
+      setTimeout(() => {
+        appendChatBubble('npc', activeQuest.npcName, opt.npcReactionEn, opt.npcReactionVi);
+        lastNpcLineEn = opt.npcReactionEn;
+        speakText(opt.npcReactionEn);
+
+        // Show Next Button
+        const nextBtn = document.getElementById('btn-next-turn');
+        const isLast = currentStepIndex >= activeQuest.steps.length - 1;
+        nextBtn.innerHTML = isLast
+          ? `<span>🎉 Hoàn Thành Nhiệm Vụ (+50 XP Bonus)</span>`
+          : `<span>Tiếp tục hội thoại</span><span>→</span>`;
+        document.getElementById('next-turn-container').classList.remove('hidden');
+      }, 450);
+    }
+
+    function advanceQuestTurn() {
+      playSound('click');
+      if (isAIMode) {
+        document.getElementById('next-turn-container').classList.add('hidden');
+        document.getElementById('coaching-card').classList.add('hidden');
+        document.getElementById('free-text-input').focus();
+        return;
+      }
+
+      if (currentStepIndex < activeQuest.steps.length - 1) {
+        currentStepIndex++;
+        renderQuestStep();
+      } else {
+        // Quest Completed!
+        playSound('levelup');
+        addRewards(50, 10);
+        showToast("🏆 Xuất sắc! Bạn đã hoàn thành trọn vẹn cốt truyện!", "level");
+        navigateTo('hub');
+      }
+    }
+
+    function switchInputMode(mode) {
+      playSound('click');
+      const tabChoice = document.getElementById('tab-choice');
+      const tabFree = document.getElementById('tab-free');
+      const panelChoices = document.getElementById('panel-choices');
+      const panelFree = document.getElementById('panel-free');
+
+      if (mode === 'choice') {
+        tabChoice.className = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow";
+        tabFree.className = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+        panelChoices.classList.remove('hidden');
+        panelFree.classList.add('hidden');
+      } else {
+        tabFree.className = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow";
+        tabChoice.className = "px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+        panelFree.classList.remove('hidden');
+        panelChoices.classList.add('hidden');
+        document.getElementById('free-text-input').focus();
+      }
+    }
+
+    // =========================================================================
+    // 8. AI CONVERSATION & FREE RESPONSE EVALUATION (GEMINI API)
+    // =========================================================================
+    function handleCreateCustomAI() {
+      const topic = document.getElementById('custom-ai-topic').value.trim();
+      if (!topic) {
+        showToast("Hãy nhập chủ đề tình huống bạn muốn luyện tập!", "warn");
+        return;
+      }
+      launchCustomAI(
+        topic,
+        "Nova (AI Partner)",
+        "🤖",
+        `Hey there! Let's jump right into our roleplay: "${topic}". How would you like to start us off?`
+      );
+    }
+
+    function launchCustomAI(topic, npcName, emoji, openingLineEn) {
+      isAIMode = true;
+      aiScenarioContext = topic;
+      aiTurnCount = 0;
+
+      document.getElementById('quest-badge').textContent = 'AI Sandbox • Live';
+      document.getElementById('quest-title').textContent = topic;
+      document.getElementById('npc-name').textContent = npcName;
+      document.getElementById('npc-role').textContent = '• Đối tác AI';
+      document.getElementById('npc-mood').textContent = '🤖 Sẵn sàng trò chuyện';
+      document.getElementById('quest-objective').textContent = `🎯 Bối cảnh: ${topic}`;
+      document.getElementById('npc-avatar-box').innerHTML = AVATARS.ai;
+      document.getElementById('quest-progress-dots').innerHTML = `<span class="text-xs font-mono text-indigo-300">Lượt: <strong id="ai-turn-counter">1</strong></span>`;
+
+      // Force Free Type / Mic mode only in AI Sandbox
+      document.getElementById('input-mode-tabs').classList.add('hidden');
+      document.getElementById('panel-choices').classList.add('hidden');
+      document.getElementById('panel-free').classList.remove('hidden');
+
+      document.getElementById('chat-feed').innerHTML = '';
+      document.getElementById('coaching-card').classList.add('hidden');
+      document.getElementById('next-turn-container').classList.add('hidden');
+
+      navigateTo('quest');
+      appendChatBubble('npc', npcName, openingLineEn, "Chào bạn! Hãy bắt đầu nhập vai tình huống này nhé.");
+      lastNpcLineEn = openingLineEn;
+      speakText(openingLineEn);
+    }
+
+    async function submitFreeResponse() {
+      const inputEl = document.getElementById('free-text-input');
+      const userText = inputEl.value.trim();
+      if (!userText) {
+        showToast("Hãy nhập hoặc nói câu tiếng Anh trước khi gửi!", "warn");
+        return;
+      }
+
+      const sendBtn = document.getElementById('btn-send-free');
+      sendBtn.disabled = true;
+      sendBtn.textContent = "AI đang chấm...";
+      inputEl.value = "";
+
+      appendChatBubble('player', 'Bạn', userText, null);
+
+      const npcName = isAIMode ? document.getElementById('npc-name').textContent : activeQuest.npcName;
+      const contextDesc = isAIMode
+        ? `Roleplay scenario: ${aiScenarioContext}. Character: ${npcName}. Last NPC line: "${lastNpcLineEn}".`
+        : `Story Quest: ${activeQuest.title}. Character: ${npcName} (${activeQuest.npcRole}). Last NPC line: "${lastNpcLineEn}".`;
+
+      const systemPrompt = `You are an encouraging bilingual English communication coach and roleplay NPC for a Vietnamese learner.
+Evaluate the user's English reply in context, rate its naturalness from 1 to 5, provide concise Vietnamese feedback explaining why it sounds natural or if there's a Viet-English trap, provide a natural Native Speaker Alternative (English + Vietnamese), and generate the NPC's next in-character response (English + Vietnamese).`;
+
+      const userPrompt = `Context: ${contextDesc}
+User's English reply: "${userText}"`;
+
+      const schema = {
+        type: "OBJECT",
+        properties: {
+          npcReplyEn: { type: "STRING" },
+          npcReplyVi: { type: "STRING" },
+          npcMood: { type: "STRING" },
+          naturalnessScore: { type: "INTEGER" },
+          feedbackVi: { type: "STRING" },
+          nativeAlternativeEn: { type: "STRING" },
+          nativeAlternativeVi: { type: "STRING" }
+        },
+        required: ["npcReplyEn", "npcReplyVi", "npcMood", "naturalnessScore", "feedbackVi", "nativeAlternativeEn", "nativeAlternativeVi"]
+      };
+
+      const aiResult = await callGeminiStructured(systemPrompt, userPrompt, schema);
+
+      sendBtn.disabled = false;
+      sendBtn.textContent = "Gửi ✨";
+
+      // Use Gemini response or smart fallback if offline
+      const result = aiResult || buildFallbackEvaluation(userText, npcName);
+
+      // Update Mood & Rewards
+      document.getElementById('npc-mood').textContent = result.npcMood || "😊 Hài lòng";
+      const score = Math.max(1, Math.min(5, result.naturalnessScore || 4));
+      if (score >= 4) {
+        playSound('success');
+        gameState.combo = Math.min(3.0, Number((gameState.combo + 0.2).toFixed(1)));
+        addRewards(score * 12, score === 5 ? 6 : 3);
+      } else {
+        playSound('click');
+        addRewards(20, 1);
+      }
+
+      // Show Coaching Feedback with Save-to-Phrasebook button
+      showCoachingFeedback({
+        score: score,
+        feedbackVi: result.feedbackVi,
+        nativeEn: result.nativeAlternativeEn,
+        nativeVi: result.nativeAlternativeVi,
+        allowSave: true
+      });
+
+      // Append NPC reply
+      appendChatBubble('npc', npcName, result.npcReplyEn, result.npcReplyVi);
+      lastNpcLineEn = result.npcReplyEn;
+      speakText(result.npcReplyEn);
+
+      if (isAIMode) {
+        aiTurnCount++;
+        const counter = document.getElementById('ai-turn-counter');
+        if (counter) counter.textContent = aiTurnCount + 1;
+      } else {
+        document.getElementById('panel-choices').classList.add('pointer-events-none', 'opacity-50');
+        const nextBtn = document.getElementById('btn-next-turn');
+        const isLast = currentStepIndex >= activeQuest.steps.length - 1;
+        nextBtn.innerHTML = isLast
+          ? `<span>🎉 Hoàn Thành Nhiệm Vụ (+50 XP Bonus)</span>`
+          : `<span>Tiếp tục hội thoại</span><span>→</span>`;
+        document.getElementById('next-turn-container').classList.remove('hidden');
+      }
+    }
+
+    function buildFallbackEvaluation(userText, npcName) {
+      const polite = /please|could|would|thanks|thank|excuse|sorry|appreciate/i.test(userText);
+      const score = polite ? 5 : 4;
+      return {
+        npcReplyEn: `That sounds great! Let's keep going—what else would you like to add?`,
+        npcReplyVi: `Nghe tuyệt đấy! Tiếp tục nào—bạn còn muốn nói thêm gì nữa không?`,
+        npcMood: "😊 Thân thiện",
+        naturalnessScore: score,
+        feedbackVi: polite
+          ? "🌟 Bạn dùng từ ngữ rất lịch sự và tự nhiên! Giữ vững phong độ giao tiếp này nhé."
+          : "👍 Ý tưởng rõ ràng! Bạn có thể thêm 'please' hoặc dùng cấu trúc 'Could I...' để câu nói mềm mại chuẩn bản xứ hơn.",
+        nativeAlternativeEn: polite ? userText : `Could you help me with that? ${userText}, please.`,
+        nativeAlternativeVi: "Cách diễn đạt tự nhiên và lịch sự hơn trong tình huống này."
+      };
+    }
+
+    function showCoachingFeedback({ score, feedbackVi, nativeEn, nativeVi, allowSave = false }) {
+      const card = document.getElementById('coaching-card');
+      const stars = '⭐'.repeat(score) + '☆'.repeat(5 - score);
+      const borderClass = score >= 4 ? 'border-emerald-500/40 bg-emerald-950/30' : 'border-amber-500/40 bg-amber-950/30';
+
+      card.className = `rounded-2xl p-4 border space-y-2.5 animate-slide-up ${borderClass}`;
+      card.innerHTML = `
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-300">🎓 Đánh Giá Giao Tiếp</span>
+          <span class="text-xs font-mono">${stars} (${score}/5)</span>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">${feedbackVi}</p>
+        ${nativeEn ? `
+          <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div class="text-[10px] font-bold uppercase text-indigo-300">✨ Gợi ý nói chuẩn bản xứ:</div>
+              <div class="text-xs sm:text-sm font-bold text-white mt-0.5">"${nativeEn}"</div>
+              ${nativeVi ? `<div class="text-[11px] text-slate-400">${nativeVi}</div>` : ''}
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button onclick="speakText('${nativeEn.replace(/'/g, "\\'")}')" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-indigo-300 font-bold">🔊 Nghe</button>
+              ${allowSave ? `<button onclick="unlockPhrase('${nativeEn.replace(/'/g, "\\'")}', '${(nativeVi || '').replace(/'/g, "\\'")}', 'Lưu từ AI Roleplay')" class="px-2.5 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-xs text-amber-300 font-bold">+ Lưu</button>` : ''}
+            </div>
+          </div>
+        ` : ''}
+      `;
+      card.classList.remove('hidden');
+    }
+
+    function appendChatBubble(sender, name, textEn, textVi) {
+      const feed = document.getElementById('chat-feed');
+      const isNpc = sender === 'npc';
+      const wrapper = document.createElement('div');
+      wrapper.className = `flex flex-col ${isNpc ? 'items-start' : 'items-end'} animate-pop-in`;
+
+      wrapper.innerHTML = `
+        <div class="flex items-center gap-1.5 mb-1 px-1">
+          <span class="text-[11px] font-bold ${isNpc ? 'text-indigo-300' : 'text-emerald-300'}">${name}</span>
+          <button onclick="speakText('${textEn.replace(/'/g, "\\'")}')" class="text-xs text-slate-400 hover:text-white transition-colors" title="Nghe phát âm">🔊</button>
+        </div>
+        <div class="max-w-[88%] sm:max-w-[78%] rounded-2xl px-4 py-3 ${isNpc ? 'bg-slate-900 border border-slate-800 text-slate-100 rounded-tl-sm' : 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white rounded-tr-sm shadow-md'}">
+          <p class="text-sm font-medium leading-relaxed">${textEn}</p>
+          ${textVi ? `<p class="vi-translation text-xs mt-1.5 pt-1.5 border-t ${isNpc ? 'border-slate-800 text-slate-400' : 'border-indigo-400/30 text-indigo-100'} ${gameState.showTranslation ? '' : 'hidden'}">${textVi}</p>` : ''}
+        </div>
+      `;
+      feed.appendChild(wrapper);
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    function speakLastNpcLine() {
+      if (lastNpcLineEn) speakText(lastNpcLineEn);
+    }
+
+    // =========================================================================
+    // 9. SPEED REFLEX 60S ARCADE GAME ENGINE
+    // =========================================================================
+    let reflexGlobalTimer = null;
+    let reflexQuestionTimer = null;
+    let reflexTimeLeft = 60;
+    let reflexQuestionTimeLeft = 100; // percentage
+    let reflexScore = 0;
+    let reflexCorrectCount = 0;
+    let reflexStreak = 0;
+    let reflexDeck = [];
+    let currentReflexQuestion = null;
+    let reflexLocked = false;
+
+    function startReflexGame() {
+      playSound('click');
+      clearInterval(reflexGlobalTimer);
+      clearInterval(reflexQuestionTimer);
+
+      reflexTimeLeft = 60;
+      reflexScore = 0;
+      reflexCorrectCount = 0;
+      reflexStreak = 0;
+      reflexDeck = [...REFLEX_QUESTIONS].sort(() => Math.random() - 0.5);
+
+      document.getElementById('reflex-play-area').classList.remove('hidden');
+      document.getElementById('reflex-gameover-area').classList.add('hidden');
+      document.getElementById('reflex-timer').textContent = '60s';
+      document.getElementById('reflex-score').textContent = '0';
+      document.getElementById('reflex-combo').textContent = '1x';
+
+      navigateTo('reflex');
+      nextReflexQuestion();
+
+      reflexGlobalTimer = setInterval(() => {
+        reflexTimeLeft--;
+        document.getElementById('reflex-timer').textContent = `${reflexTimeLeft}s`;
+        if (reflexTimeLeft <= 10) {
+          document.getElementById('reflex-timer').classList.add('animate-pulse');
+        }
+        if (reflexTimeLeft <= 0) {
+          endReflexGame(false);
+        }
+      }, 1000);
+    }
+
+    function nextReflexQuestion() {
+      clearInterval(reflexQuestionTimer);
+      reflexLocked = false;
+
+      if (reflexDeck.length === 0) {
+        reflexDeck = [...REFLEX_QUESTIONS].sort(() => Math.random() - 0.5);
+      }
+      currentReflexQuestion = reflexDeck.pop();
+
+      document.getElementById('reflex-context-tag').textContent = currentReflexQuestion.context;
+      document.getElementById('reflex-prompt-en').textContent = `"${currentReflexQuestion.en}"`;
+      const viEl = document.getElementById('reflex-prompt-vi');
+      viEl.textContent = `(${currentReflexQuestion.vi})`;
+      viEl.classList.toggle('hidden', !gameState.showTranslation);
+
+      const banner = document.getElementById('reflex-feedback-banner');
+      banner.classList.add('hidden');
+
+      // Shuffle 4 options
+      const opts = [...currentReflexQuestion.options].sort(() => Math.random() - 0.5);
+      const optionsContainer = document.getElementById('reflex-options');
+      optionsContainer.innerHTML = opts.map((opt, idx) => `
+        <button onclick='handleReflexAnswer(${idx}, ${opt.correct}, "${opt.note.replace(/"/g, '&quot;')}")' id="reflex-opt-${idx}" class="rpg-btn text-left p-4 rounded-2xl bg-slate-900/95 hover:bg-slate-800 border border-slate-700/90 text-sm font-bold text-white transition-all">
+          ${opt.text}
+        </button>
+      `).join('');
+
+      speakText(currentReflexQuestion.en);
+
+      // 10-second per question bar
+      reflexQuestionTimeLeft = 100;
+      const bar = document.getElementById('reflex-question-bar');
+      bar.style.width = '100%';
+
+      reflexQuestionTimer = setInterval(() => {
+        reflexQuestionTimeLeft -= 1.25; // ~8 seconds per question
+        bar.style.width = `${Math.max(0, reflexQuestionTimeLeft)}%`;
+        if (reflexQuestionTimeLeft <= 0) {
+          clearInterval(reflexQuestionTimer);
+          handleReflexAnswer(-1, false, "⏰ Hết giờ câu này! Hãy phản xạ nhanh hơn nhé.");
+        }
+      }, 100);
+    }
+
+    function handleReflexAnswer(idx, isCorrect, note) {
+      if (reflexLocked) return;
+      reflexLocked = true;
+      clearInterval(reflexQuestionTimer);
+
+      const banner = document.getElementById('reflex-feedback-banner');
+      banner.classList.remove('hidden');
+
+      if (isCorrect) {
+        playSound('success');
+        reflexStreak++;
+        reflexCorrectCount++;
+        const mult = reflexStreak >= 5 ? 3 : (reflexStreak >= 3 ? 2 : 1);
+        const speedBonus = Math.round(reflexQuestionTimeLeft / 5);
+        const pts = (100 + speedBonus) * mult;
+        reflexScore += pts;
+
+        document.getElementById('reflex-score').textContent = reflexScore;
+        document.getElementById('reflex-combo').textContent = `${mult}x 🔥`;
+
+        if (idx >= 0) {
+          const btn = document.getElementById(`reflex-opt-${idx}`);
+          if (btn) btn.className = "p-4 rounded-2xl bg-emerald-600/30 border-2 border-emerald-400 text-sm font-extrabold text-emerald-200";
+        }
+        banner.className = "rounded-2xl p-3.5 text-xs sm:text-sm font-semibold text-center bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 animate-pop-in";
+        banner.textContent = `✅ +${pts} điểm! ${note}`;
+      } else {
+        playSound('error');
+        reflexStreak = 0;
+        document.getElementById('reflex-combo').textContent = '1x';
+        if (idx >= 0) {
+          const btn = document.getElementById(`reflex-opt-${idx}`);
+          if (btn) btn.className = "p-4 rounded-2xl bg-rose-600/30 border-2 border-rose-500 text-sm font-extrabold text-rose-200";
+        }
+        banner.className = "rounded-2xl p-3.5 text-xs sm:text-sm font-semibold text-center bg-rose-500/20 border border-rose-500/40 text-rose-200 animate-pop-in";
+        banner.textContent = `❌ ${note}`;
+      }
+
+      setTimeout(() => {
+        if (reflexTimeLeft > 0) {
+          nextReflexQuestion();
+        }
+      }, 1350);
+    }
+
+    function endReflexGame(aborted) {
+      clearInterval(reflexGlobalTimer);
+      clearInterval(reflexQuestionTimer);
+      document.getElementById('reflex-timer').classList.remove('animate-pulse');
+
+      if (aborted) {
+        navigateTo('hub');
+        return;
+      }
+
+      playSound('levelup');
+      document.getElementById('reflex-play-area').classList.add('hidden');
+      document.getElementById('reflex-gameover-area').classList.remove('hidden');
+
+      const earnedXp = Math.max(20, Math.round(reflexScore / 12));
+      document.getElementById('reflex-final-score').textContent = reflexScore;
+      document.getElementById('reflex-final-correct').textContent = reflexCorrectCount;
+      document.getElementById('reflex-final-xp').textContent = `+${earnedXp}`;
+
+      if (reflexScore > gameState.highScoreReflex) {
+        gameState.highScoreReflex = reflexScore;
+      }
+      addRewards(earnedXp, Math.floor(reflexCorrectCount / 2));
+    }
+
+    // =========================================================================
+    // 10. PHRASEBOOK DRAWER & TOAST SYSTEM
+    // =========================================================================
+    function openPhrasebook() {
+      playSound('click');
+      renderPhrasebook();
+      document.getElementById('phrasebook-overlay').classList.remove('hidden');
+      document.getElementById('phrasebook-drawer').classList.remove('translate-x-full');
+    }
+
+    function closePhrasebook() {
+      playSound('click');
+      document.getElementById('phrasebook-overlay').classList.add('hidden');
+      document.getElementById('phrasebook-drawer').classList.add('translate-x-full');
+    }
+
+    function renderPhrasebook() {
+      const query = (document.getElementById('phrasebook-search').value || '').toLowerCase();
+      const list = document.getElementById('phrasebook-list');
+
+      const filtered = gameState.phrasebook.filter(item =>
+        item.en.toLowerCase().includes(query) ||
+        item.vi.toLowerCase().includes(query) ||
+        (item.context && item.context.toLowerCase().includes(query))
+      );
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<div class="text-center text-xs text-slate-500 py-10">Chưa có cụm từ nào khớp tìm kiếm. Hãy chơi các nhiệm vụ để mở khóa thêm nhé!</div>`;
+        return;
+      }
+
+      list.innerHTML = filtered.map(item => `
+        <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 space-y-1.5">
+          <div class="flex items-start justify-between gap-2">
+            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30">
+              ${item.context || 'Cụm từ bản xứ'}
+            </span>
+            <button onclick="speakText('${item.en.replace(/'/g, "\\'")}')" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-indigo-600 text-xs text-indigo-300 hover:text-white transition-colors">
+              🔊 Nghe
+            </button>
+          </div>
+          <p class="font-bold text-sm text-white leading-snug">"${item.en}"</p>
+          <p class="text-xs text-slate-400">${item.vi}</p>
+        </div>
+      `).join('');
+    }
+
+    function showToast(message, type = "info") {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+
+      const styles = {
+        xp: "bg-indigo-950/95 border-indigo-400/50 text-indigo-200",
+        level: "bg-gradient-to-r from-amber-600 to-orange-600 border-amber-300 text-white font-extrabold",
+        warn: "bg-rose-950/95 border-rose-500/50 text-rose-200",
+        info: "bg-slate-900/95 border-slate-700 text-slate-200"
+      };
+
+      toast.className = `pointer-events-auto px-4 py-3 rounded-2xl border shadow-xl text-xs sm:text-sm animate-pop-in ${styles[type] || styles.info}`;
+      toast.textContent = message;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 2800);
+    }
+
+    // Initialize HUD on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      updateHUD();
+    });
+  </script>
+</body>
+</html>
